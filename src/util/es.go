@@ -12,13 +12,12 @@ var Conn *es.Conn
 func init() {
 	err, hosts := config.GetStringMapString("es", "hosts")
 	if err != nil {
-		hosts = "localhost"
-		log.Warn(err)
+		log.Error(err)
 	}
 	err, port := config.GetStringMapString("es", "port")
 	if err != nil {
 		port = "9200"
-		log.Warn(err)
+		log.Warn("can't find es port default:9200")
 	}
 	Conn = es.NewConn()
 	Conn.SetHosts(strings.Split(hosts, ","))
