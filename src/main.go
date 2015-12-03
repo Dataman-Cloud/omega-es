@@ -42,14 +42,23 @@ func initGin() {
 func authenticate(ctx *gin.Context) {
 	authenticated := false
 	author := util.Header(ctx, "Authorization")
+	if len(author) > 0 {
+		conn := util.Open()
+		defer conn.Close()
+		uid, err := redis.String(conn.Do("HGET", "s:"+author, "user_id"))
+		if err == nil {
+			authenticated = true
+			ctx.Set("uid", uid)
+		} else if err != redis.ErrNil {
+			log.Error("[app] got error1 ", err)
+		}
+	}
 	if authenticated {
 		ctx.Next()
 	} else {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"status": -1})
 		ctx.Abort()
 	}
-	log.Debug("============", author)
-	ctx.Abort()
 }
 
 func optionHandler(ctx *gin.Context) {
