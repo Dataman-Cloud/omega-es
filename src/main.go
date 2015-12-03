@@ -3,8 +3,7 @@ package main
 import (
 	"github.com/Dataman-cloud/omega-es/src/config"
 	. "github.com/Dataman-cloud/omega-es/src/es"
-	"github.com/Dataman-cloud/omega-es/src/logger"
-	"github.com/Dataman-cloud/omega-es/src/util"
+	_ "github.com/Dataman-cloud/omega-es/src/logger"
 	log "github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -12,9 +11,6 @@ import (
 )
 
 func main() {
-	config.InitConfigFile()
-	logger.InitLogger()
-	util.InitES()
 	initGin()
 }
 

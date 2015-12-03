@@ -11,7 +11,7 @@ var (
 	file       string
 )
 
-func InitLogger() {
+func init() {
 	_, console = config.GetStringMapBool("log", "console")
 	_, appendfile = config.GetStringMapBool("log", "appendfile")
 	_, file = config.GetStringMapString("log", "file")

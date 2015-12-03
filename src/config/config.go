@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-func InitConfigFile() {
+func init() {
 	viper.SetConfigName("omega-es")
 	viper.AddConfigPath(".")
 	err := viper.ReadInConfig()

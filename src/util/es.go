@@ -9,7 +9,7 @@ import (
 
 var Conn *es.Conn
 
-func InitES() {
+func init() {
 	err, hosts := config.GetStringMapString("es", "hosts")
 	if err != nil {
 		hosts = "localhost"
