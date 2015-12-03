@@ -6,6 +6,7 @@ import (
 	_ "github.com/Dataman-cloud/omega-es/src/logger"
 	"github.com/Dataman-cloud/omega-es/src/util"
 	log "github.com/cihub/seelog"
+	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
