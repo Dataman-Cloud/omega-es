@@ -4,6 +4,7 @@ import (
 	"github.com/Dataman-cloud/omega-es/src/config"
 	. "github.com/Dataman-cloud/omega-es/src/es"
 	_ "github.com/Dataman-cloud/omega-es/src/logger"
+	"github.com/Dataman-cloud/omega-es/src/util"
 	log "github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -39,8 +40,16 @@ func initGin() {
 }
 
 func authenticate(ctx *gin.Context) {
-	/*author := util.Header(ctx, "Authorization")
-	ctx.Abort()*/
+	authenticated := false
+	author := util.Header(ctx, "Authorization")
+	if authenticated {
+		ctx.Next()
+	} else {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"status": -1})
+		ctx.Abort()
+	}
+	log.Debug("============", author)
+	ctx.Abort()
 }
 
 func optionHandler(ctx *gin.Context) {
