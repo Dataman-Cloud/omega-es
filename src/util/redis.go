@@ -14,7 +14,6 @@ func init() {
 
 func initPool() *redis.Pool {
 	err, host := config.GetStringMapString("redis", "host")
-	host = "localhost"
 	if err != nil {
 		log.Error(err)
 	}
