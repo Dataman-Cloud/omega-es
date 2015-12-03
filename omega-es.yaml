@@ -1,0 +1,12 @@
+host: "0.0.0.0"
+port: 9200
+log:
+    console: true
+    appendfile: false
+    file: "./log/omega-es.log"
+    level: "debug"
+    formatter: "text"
+    maxSize: 1024000
+es:
+    hosts: "10.3.11.29,10.3.11.30,10.3.11.31"
+    port: 9200
