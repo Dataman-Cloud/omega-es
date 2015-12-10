@@ -11,10 +11,9 @@ func logConfig() string {
 		logconfig += `<console/>`
 	}
 	if appendfile {
-		logconfig += `<rollingfile type="size" filename="` + file + `" maxsize="100" maxrolls="5" />
-		<buffered formatid="main" size="10000" flushperiod="1000">
-		<file path="./log/bufFileFlush.log"/>
-                      </buffered>`
+		logconfig += `<buffered size="10000" flushperiod="1000">`
+		logconfig += `<rollingfile type="size" filename="` + file + `" maxsize="5000000" maxrolls="30" />`
+		lgoconfig += `</buffered>`
 	}
 	logconfig += `</outputs>
 	           <formats>
