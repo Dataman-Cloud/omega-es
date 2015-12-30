@@ -10,30 +10,28 @@
 curl -X POST http://123.59.58.58:8080/search/index \
         -H Authorization:usertoken \
         -H Content-Type:application/json -d '{
-        	"clusterid": 19, 
-            "appname": "chronos", 
-            "hosts":["10.3.11.2"], 
-            "start": "2015-11-01T15:17:24", 
-            "end": "2015-11-01T15:17:24", 
-            "from":0, 
-            "size":20, 
-            "userid":1,
-            "keyword": "test"
-       }'
+    "userid": 1,
+    "clusterid": 71,
+    "appname": "afgsdfghsdf",
+    "start": "2015-12-30T14:16:56.644+08:00",
+    "end": "2015-12-30T14:19:56.643+08:00",
+    "from": 0,
+    "size": 20,
+    "ipport": "10.3.11.18:[31757]",
+    "keyword": "test"
+}'
 ```
 ####POST `/search/jump`
 ```shell
 curl -X POST http://123.59.58.58:8080/search/jump \
         -H Authorization:usertoken \
         -H Content-Type:application/json -d '{
-            "userid":1,
-        	"clusterid": 19, 
-            "taskid":"adfasd",
-            "start": "2015-11-01T15:17:24", 
-            "end": "2015-11-01T15:17:24", 
-            "appname": "chronos", 
-            "from":0, 
-            "size":20
-       }'
+    "userid": 1,
+    "clusterid": 71,
+    "appname": "htmltest",
+    "timestamp": "2015-12-30T16:08:07.272+08:00",
+    "ipport": "10.3.11.18:[31092]",
+    "counter": 3
+}'
 ```
 
