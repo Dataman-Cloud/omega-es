@@ -59,7 +59,7 @@ func auth(c *echo.Context) error {
 	if auth {
 		return nil
 	} else {
-		err := errors.New("validation failed...")
+		err := errors.New(time.Now().Format(time.RFC3339Nano) + " " + "validation failed...")
 		return err
 	}
 }
