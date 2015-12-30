@@ -24,7 +24,7 @@ func initEcho() {
 	e := echo.New()
 
 	//e.Use(mw.Recover(), mw.Logger())
-	e.Use(mw.Recover(), mw.Logger(), auth)
+	e.Use(mw.Recover(), util.Logger(), auth)
 
 	es := e.Group("/es")
 	{
