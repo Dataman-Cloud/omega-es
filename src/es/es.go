@@ -3,185 +3,289 @@ package es
 import (
 	. "github.com/Dataman-Cloud/omega-es/src/util"
 	log "github.com/cihub/seelog"
-	"github.com/gin-gonic/gin"
 	"github.com/jeffail/gabs"
+	"github.com/labstack/echo"
 	"strconv"
 	"strings"
 )
 
-func Search(c *gin.Context) {
+func SearchIndex(c *echo.Context) error {
 	body, err := ReadBody(c)
 	if err != nil {
-		log.Error(err)
+		log.Error("searchindex can't get request body")
+		return ReturnError(c, map[string]string{"error": "searchindex can't get request body"})
 	}
 	json, err := gabs.ParseJSON(body)
 	if err != nil {
-		log.Error("body parse json error: ", json)
-		ReturnError(c, map[string]string{"error": "body parse json error"})
+		log.Error("searchindex param parse json error")
+		return ReturnError(c, map[string]string{"error": "searchindex param parse json error"})
 	}
 
 	userid, ok := json.Path("userid").Data().(float64)
 	if !ok {
-		log.Error("can't find userid")
-		ReturnError(c, map[string]string{"error": "can't find userid"})
+		log.Error("searchindex param can't found userid")
+		return ReturnError(c, map[string]string{"error": "searchindex can't found userid"})
 	}
 
 	clusterid, ok := json.Path("clusterid").Data().(float64)
 	if !ok {
-		log.Error("can't find clustername")
-		ReturnError(c, map[string]string{"error": "can't find clustername"})
+		log.Error("searchindex param can't found clusterid")
+		return ReturnError(c, map[string]string{"error": "searchindex can't found clusterid"})
 	}
-
-	var fields []string
 
 	appname, ok := json.Path("appname").Data().(string)
 	if !ok {
-		log.Error("can't find appname")
-		ReturnError(c, map[string]string{"error": "can't find appname"})
-	}
-
-	fields = append(fields, `{"term":{"typename":"`+appname+`"}}`)
-
-	hosts, err := json.S("hosts").Children()
-	if err == nil && len(hosts) > 0 {
-		fields = append(fields, `{"terms":{"ip": `+json.S("hosts").String()+`}}`)
+		log.Error("searchindex param can't found appname")
+		return ReturnError(c, map[string]string{"error": "searchindex can't found appname"})
 	}
 
 	start, ok := json.Path("start").Data().(string)
 	if !ok {
-		log.Error("can't find start time")
-		ReturnError(c, map[string]string{"error": "can't find start time"})
+		log.Error("searchindex param can't found starttime")
+		return ReturnError(c, map[string]string{"error": "searchindex can't found starttime"})
 	}
 
 	end, ok := json.Path("end").Data().(string)
 	if !ok {
-		log.Error("can't find end time")
-		ReturnError(c, map[string]string{"error": "can't find end time"})
-	}
-
-	fields = append(fields, `{"range":{"timestamp":{"gte":"`+start+`","lte":"`+end+`"}}}`)
-
-	keyword, ok := json.Path("keyword").Data().(string)
-	if ok {
-		fields = append(fields, `{"match":{"msg":{"query":"`+keyword+`","analyzer":"ik"}}}`)
+		log.Error("searchindex param can't found endtime")
+		return ReturnError(c, map[string]string{"error": "searchindex can't found endtime"})
 	}
 
 	from, ok := json.Path("from").Data().(float64)
 	if !ok {
-		log.Error("can't find from")
-		ReturnError(c, map[string]string{"error": "can't find from"})
+		log.Error("searchindex param can't found from")
+		return ReturnError(c, map[string]string{"error": "searchindex can't found from"})
 	}
 
 	size, ok := json.Path("size").Data().(float64)
 	if !ok {
-		log.Error("can't find size")
-		ReturnError(c, map[string]string{"error": "can't find size"})
+		log.Error("searchindex param can't found size")
+		return ReturnError(c, map[string]string{"error": "searchindex can't found size"})
+	}
+	if size > 200 {
+		size = 200
 	}
 
-	query := `{"fields":["timestamp","msg","ip","taskid"],
-		"sort":{"timestamp":"asc"},"highlight":
-		{"fields":{"msg":{"post_tags":["\u003c/em\u003e"],
-		"pre_tags":["\u003cem style=\"color:red;\"\u003e"]}},
-		"fragment_size":-1,"require_field_match":"true"},
-		"query":{"bool":{"must":[` + strings.Join(fields, ",") + `]}},
-		"from":` + strconv.Itoa(int(from)) + `,"size":` + strconv.Itoa(int(size)) + `}`
-	index := "logstash-" + strconv.Itoa(int(userid)) + "-"
-	ok, ymd := SameDay(start, end)
-	if ok {
-		index += ymd
+	ipport, iok := json.Path("ipport").Data().(string)
+	keyword, kok := json.Path("keyword").Data().(string)
+
+	query := `{
+		    "query": {
+		      "bool": {
+		        "must": [
+  	                  {
+	                    "range": {
+                              "timestamp": {
+                                "gte": "` + start + `",
+                                "lte": "` + end + `"
+                              }
+                            }
+		          },
+			  {
+                            "term": {"typename": "` + appname + `"}
+			  }`
+	if kok {
+		query += `,
+		          {
+		            "match": {
+		              "msg": {
+			        "query": "` + keyword + `",
+                                "analyzer": "ik"
+			      }
+                            }
+			  }`
+	}
+	if iok {
+		query += `,
+			  {
+			    "terms": {
+			      "ipport": ["` + ipport + `"],
+			      "minimum_match": 1
+			  }
+			}`
+	}
+	query += `
+		      ]
+		    }
+		  },
+		"sort": {"timestamp.sort": "asc"},
+		"from": ` + strconv.Itoa(int(from)) + `,
+		"size": ` + strconv.Itoa(int(size)) + `,
+		"fields": ["timestamp","msg","ipport","ip","taskid","counter", "typename"],
+		"highlight": {
+	          "require_field_match": "true",
+		  "fields": {
+		    "msg": {
+		      "pre_tags": ["<em style=\"color:red;\">"],
+		      "post_tags": ["</em>"]
+	            }
+	          },
+		  "fragment_size": -1
+		}
+	       }`
+	esindex := "logstash-" + strconv.Itoa(int(userid)) + "-"
+	if start[:10] == end[:10] {
+		esindex += start[:10]
 	} else {
-		index += "*"
+		esindex += "*"
 	}
 	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
-
-	out, err := Conn.Search(index, estype, nil, query)
+	out, err := Conn.Search(esindex, estype, nil, query)
+	if err != nil {
+		log.Error("searchindex search es error: ", err)
+		return ReturnError(c, map[string]string{"error": "searchindex search es error"})
+	}
 	content, _ := gabs.ParseJSON(out.RawJSON)
-
-	ReturnOK(c, content.Data())
+	hits, err := content.Path("hits.hits").Children()
+	if err != nil {
+		log.Error("searchindex get hits error: ", err)
+		return ReturnError(c, map[string]string{"error": "searchindex get hits error"})
+	}
+	if err == nil {
+		if len(hits) > 0 {
+			for i, hit := range hits {
+				msgs, err := hit.Path("fields.msg").Children()
+				if err == nil {
+					msg := msgs[0].Data().(string)
+					msg = strings.Replace(msg, "&", "&amp;", -1)
+					msg = strings.Replace(msg, "<", "&lt;", -1)
+					msg = strings.Replace(msg, ">", "&gt;", -1)
+					msg = strings.Replace(msg, "\"", "&quot;", -1)
+					msg = strings.Replace(msg, " ", "&nbsp;", -1)
+					hits[i].Path("fields.msg").SetIndex(msg, 0)
+				} else {
+					continue
+				}
+			}
+		}
+	} else {
+		log.Error("searchindex get hits error: ", err)
+		return ReturnError(c, map[string]string{"error": "searchindex get hits error"})
+	}
+	return ReturnOK(c, content.Data())
 }
 
-func SearchJump(c *gin.Context) {
+func SearchContext(c *echo.Context) error {
 	body, err := ReadBody(c)
 	if err != nil {
-		log.Error(err)
+		log.Error("searchcontext can't get request body")
+		return ReturnError(c, map[string]string{"error": "searchcontext can't get request body"})
 	}
 	json, err := gabs.ParseJSON(body)
 	if err != nil {
-		log.Error("body parse json error: ", json)
-		ReturnError(c, map[string]string{"error": "body parse json error"})
+		log.Error("searchcontext param parse json error")
+		return ReturnError(c, map[string]string{"error": "searchcontext param parse json error"})
 	}
 
 	userid, ok := json.Path("userid").Data().(float64)
 	if !ok {
-		log.Error("can't find userid")
-		ReturnError(c, map[string]string{"error": "can't find userid"})
+		log.Error("searchcontext param can't found userid")
+		return ReturnError(c, map[string]string{"error": "searchcontext can't found userid"})
 	}
 
 	clusterid, ok := json.Path("clusterid").Data().(float64)
 	if !ok {
-		log.Error("can't find clustername")
-		ReturnError(c, map[string]string{"error": "can't find clustername"})
+		log.Error("searchcontext param can't found clusterid")
+		return ReturnError(c, map[string]string{"error": "searchcontext can't found clusterid"})
 	}
 
-	var fields []string
-
-	taskid, ok := json.Path("taskid").Data().(string)
+	ipport, ok := json.Path("ipport").Data().(string)
 	if !ok {
-		log.Error("can't find taskid")
-		ReturnError(c, map[string]string{"error": "can't find taskid"})
-	}
-	fields = append(fields, `{"term":{"taskid":"`+taskid+`"}}`)
-
-	start, ok := json.Path("start").Data().(string)
-	if !ok {
-		log.Error("can't find start time")
-		ReturnError(c, map[string]string{"error": "can't find start time"})
+		log.Error("searchcontext param can't found ipport")
+		return ReturnError(c, map[string]string{"error": "searchcontext can't found ipport"})
 	}
 
-	end, ok := json.Path("end").Data().(string)
+	timestamp, ok := json.Path("timestamp").Data().(string)
 	if !ok {
-		log.Error("can't find end time")
-		ReturnError(c, map[string]string{"error": "can't find end time"})
+		log.Error("searchcontext param can't found timestamp")
+		return ReturnError(c, map[string]string{"error": "searchcontext can't found timestamp"})
 	}
-	fields = append(fields, `{"range":{"timestamp":{"gte":"`+start+`","lte":"`+end+`"}}}`)
+
+	counter, ok := json.Path("counter").Data().(float64)
+	if !ok {
+		log.Error("searchcontext param can't found counter")
+		return ReturnError(c, map[string]string{"error": "searchcontext can't found counter"})
+	}
 
 	appname, ok := json.Path("appname").Data().(string)
 	if !ok {
-		log.Error("can't find appname")
-		ReturnError(c, map[string]string{"error": "can't find appname"})
+		log.Error("searchcontext param can't found appname")
+		return ReturnError(c, map[string]string{"error": "searchcontext can't found appname"})
 	}
 
-	from, ok := json.Path("from").Data().(float64)
-	if !ok {
-		log.Error("can't find from")
-		ReturnError(c, map[string]string{"error": "can't find from"})
+	countergte := int(counter) - 100
+	if countergte < 0 {
+		countergte = 0
 	}
+	counterlte := int(counter) + 100
 
-	size, ok := json.Path("size").Data().(float64)
-	if !ok {
-		log.Error("can't find size")
-		ReturnError(c, map[string]string{"error": "can't find size"})
-	}
-
-	query := `{"fields":["timestamp","msg","ip","taskid"],
-                "sort":{"timestamp":"asc"},"highlight":
-                {"fields":{"msg":{"post_tags":["\u003c/em\u003e"],
-                "pre_tags":["\u003cem style=\"color:red;\"\u003e"]}},
-                "fragment_size":-1,"require_field_match":"true"},
-                "query":{"bool":{"must":[` + strings.Join(fields, ",") + `]}},
-                "from":` + strconv.Itoa(int(from)) + `,"size":` + strconv.Itoa(int(size)) + `}`
-
-	index := "logstash-" + strconv.Itoa(int(userid)) + "-"
-	ok, ymd := SameDay(start, end)
-	if ok {
-		index += ymd
-	} else {
-		index += "*"
-	}
+	query := `{
+		    "query": {
+		      "bool": {
+	                "must": [
+			  {
+			    "range": {
+			      "counter": {
+			        "gte": ` + strconv.Itoa(countergte) + `,
+				"lte": ` + strconv.Itoa(counterlte) + `
+			      }
+			    }
+			  },
+			  {
+			    "term": {"ipport": "` + ipport + `"}
+			  }
+			]
+		      }
+		    },
+		    "sort": {"timestamp.sort": "asc"},
+		    "from": 0,
+		    "size": 200,
+		    "fields": ["timestamp","msg","ipport","ip","taskid","counter"],
+		    "highlight": {
+	              "require_field_match": "true",
+		      "fields": {
+		        "msg": {
+	                  "pre_tags": ["<em style=\"color:red;\">"],
+			  "post_tags": ["</em>"]
+		        }
+		      },
+		      "fragment_size": -1
+	            }
+		  }`
+	esindex := "logstash-" + strconv.Itoa(int(userid)) + "-" + timestamp[:10]
 	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
-
-	out, err := Conn.Search(index, estype, nil, query)
+	out, err := Conn.Search(esindex, estype, nil, query)
+	if err != nil {
+		log.Error("searchindex search es error: ", err)
+		return ReturnError(c, map[string]string{"error": "searchindex search es error"})
+	}
 	content, _ := gabs.ParseJSON(out.RawJSON)
-
-	ReturnOK(c, content.Data())
+	hits, err := content.Path("hits.hits").Children()
+	if err != nil {
+		log.Error("searchindex get hits error: ", err)
+		return ReturnError(c, map[string]string{"error": "searchindex get hits error"})
+	}
+	if err == nil {
+		if len(hits) > 0 {
+			for i, hit := range hits {
+				msgs, err := hit.Path("fields.msg").Children()
+				if err == nil {
+					msg := msgs[0].Data().(string)
+					log.Debug(msg)
+					msg = strings.Replace(msg, "&", "&amp;", -1)
+					msg = strings.Replace(msg, "<", "&lt;", -1)
+					msg = strings.Replace(msg, ">", "&gt;", -1)
+					msg = strings.Replace(msg, "\"", "&quot;", -1)
+					msg = strings.Replace(msg, " ", "&nbsp;", -1)
+					hits[i].Path("fields.msg").SetIndex(msg, 0)
+				} else {
+					continue
+				}
+			}
+		}
+	} else {
+		log.Error("searchindex get hits error: ", err)
+		return ReturnError(c, map[string]string{"error": "searchindex get hits error"})
+	}
+	return ReturnOK(c, content.Data())
 }

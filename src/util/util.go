@@ -3,14 +3,14 @@ package util
 import (
 	"bytes"
 	"errors"
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo"
 	"net/http"
 	"strings"
 )
 
-func ReadBody(c *gin.Context) ([]byte, error) {
+func ReadBody(c *echo.Context) ([]byte, error) {
 	buf := new(bytes.Buffer)
-	_, err := buf.ReadFrom(c.Request.Body)
+	_, err := buf.ReadFrom(c.Request().Body)
 	if err != nil {
 		return nil, errors.New("read request body error")
 	}
@@ -26,16 +26,16 @@ func SameDay(start, end string) (bool, string) {
 	return false, ""
 }
 
-func ReturnOK(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusOK, data)
+func ReturnOK(ctx *echo.Context, data interface{}) error {
+	return ctx.JSON(http.StatusOK, data)
 }
 
-func ReturnError(ctx *gin.Context, data interface{}) {
-	ctx.JSON(http.StatusBadRequest, data)
+func ReturnError(c *echo.Context, data interface{}) error {
+	return c.JSON(http.StatusBadRequest, data)
 }
 
-func Header(c *gin.Context, key string) string {
-	if values, _ := c.Request.Header[key]; len(values) > 0 {
+func Header(c *echo.Context, key string) string {
+	if values, _ := c.Request().Header[key]; len(values) > 0 {
 		return values[0]
 	}
 	return ""
