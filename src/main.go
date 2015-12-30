@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/Dataman-cloud/omega-es/src/config"
-	. "github.com/Dataman-cloud/omega-es/src/es"
-	_ "github.com/Dataman-cloud/omega-es/src/logger"
-	"github.com/Dataman-cloud/omega-es/src/util"
+	"github.com/Dataman-Cloud/omega-es/src/config"
+	. "github.com/Dataman-Cloud/omega-es/src/es"
+	_ "github.com/Dataman-Cloud/omega-es/src/logger"
+	"github.com/Dataman-Cloud/omega-es/src/util"
 	log "github.com/cihub/seelog"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"

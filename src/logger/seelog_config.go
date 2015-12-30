@@ -13,7 +13,7 @@ func logConfig() string {
 	if appendfile {
 		logconfig += `<buffered size="10000" flushperiod="1000">`
 		logconfig += `<rollingfile type="size" filename="` + file + `" maxsize="5000000" maxrolls="30" />`
-		lgoconfig += `</buffered>`
+		logconfig += `</buffered>`
 	}
 	logconfig += `</outputs>
 	           <formats>

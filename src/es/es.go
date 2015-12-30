@@ -1,7 +1,7 @@
 package es
 
 import (
-	. "github.com/Dataman-cloud/omega-es/src/util"
+	. "github.com/Dataman-Cloud/omega-es/src/util"
 	log "github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
 	"github.com/jeffail/gabs"
