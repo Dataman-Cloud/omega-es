@@ -66,7 +66,8 @@ func SearchIndex(c *echo.Context) error {
 		size = 200
 	}
 
-	ipport, iok := json.Path("ipport").Data().(string)
+	//ipport, iok := json.Path("ipport").Data().(string)
+	ipport, err := json.Path("ipport").Children()
 	keyword, kok := json.Path("keyword").Data().(string)
 
 	query := `{
@@ -95,11 +96,15 @@ func SearchIndex(c *echo.Context) error {
                             }
 			  }`
 	}
-	if iok {
+	if err == nil && len(ipport) > 0 {
+		var arr []string
+		for _, ipp := range ipport {
+			arr = append(arr, ipp.Data().(string))
+		}
 		query += `,
 			  {
 			    "terms": {
-			      "ipport": ["` + ipport + `"],
+			      "ipport": ["` + strings.Join(arr, ",") + `"],
 			      "minimum_match": 1
 			  }
 			}`
