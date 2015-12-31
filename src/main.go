@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"github.com/Dataman-Cloud/omega-es/src/config"
 	. "github.com/Dataman-Cloud/omega-es/src/es"
 	_ "github.com/Dataman-Cloud/omega-es/src/logger"
@@ -59,7 +58,6 @@ func auth(c *echo.Context) error {
 	if auth {
 		return nil
 	} else {
-		err := errors.New(time.Now().Format(time.RFC3339Nano) + " " + "validation failed...")
-		return err
+		return echo.NewHTTPError(http.StatusUnauthorized, time.Now().Format(time.RFC3339Nano)+" "+"validation failed...")
 	}
 }
