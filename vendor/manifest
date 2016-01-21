@@ -1,0 +1,82 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/araddon/gou",
+			"repository": "https://github.com/araddon/gou",
+			"revision": "5e9110908156ae10fe90dd01d6c9fcbe058a6c9e",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/bitly/go-hostpool",
+			"repository": "https://github.com/bitly/go-hostpool",
+			"revision": "d0e59c22a56e8dadfed24f74f452cea5a52722d2",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/garyburd/redigo/internal",
+			"repository": "https://github.com/garyburd/redigo",
+			"revision": "836b6e58b3358112c8291565d01c35b8764070d7",
+			"branch": "master",
+			"path": "/internal"
+		},
+		{
+			"importpath": "github.com/garyburd/redigo/redis",
+			"repository": "https://github.com/garyburd/redigo",
+			"revision": "836b6e58b3358112c8291565d01c35b8764070d7",
+			"branch": "master",
+			"path": "/redis"
+		},
+		{
+			"importpath": "github.com/jeffail/gabs",
+			"repository": "https://github.com/jeffail/gabs",
+			"revision": "b69c9e648a2529c8d7b927ba7f87bc7fe0b3b0ea",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/jessevdk/go-flags",
+			"repository": "https://github.com/jessevdk/go-flags",
+			"revision": "d91b7c5a5ce0b1d99d765ec3fb20ab590e52ddcb",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/labstack/echo",
+			"repository": "https://github.com/labstack/echo",
+			"revision": "ec83e2407f257c0fa7b5ee17727d175d9d6e9f1a",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/labstack/gommon/color",
+			"repository": "https://github.com/labstack/gommon",
+			"revision": "0764305a9af697a66da7bda2ea52672b7eca5a06",
+			"branch": "master",
+			"path": "/color"
+		},
+		{
+			"importpath": "github.com/labstack/gommon/log",
+			"repository": "https://github.com/labstack/gommon",
+			"revision": "0764305a9af697a66da7bda2ea52672b7eca5a06",
+			"branch": "master",
+			"path": "/log"
+		},
+		{
+			"importpath": "github.com/mattbaird/elastigo/lib",
+			"repository": "https://github.com/mattbaird/elastigo",
+			"revision": "bd9e895823b8d2159b9a3dcf8ef17498eb886769",
+			"branch": "master",
+			"path": "/lib"
+		},
+		{
+			"importpath": "github.com/mattn/go-colorable",
+			"repository": "https://github.com/mattn/go-colorable",
+			"revision": "3dac7b4f76f6e17fb39b768b89e3783d16e237fe",
+			"branch": "master"
+		},
+		{
+			"importpath": "github.com/mattn/go-isatty",
+			"repository": "https://github.com/mattn/go-isatty",
+			"revision": "56b76bdf51f7708750eac80fa38b952bb9f32639",
+			"branch": "master"
+		}
+	]
+}
