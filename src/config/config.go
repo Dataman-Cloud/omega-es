@@ -8,7 +8,8 @@ import (
 
 func init() {
 	viper.SetConfigName("omega-es")
-	viper.AddConfigPath(".")
+	viper.AddConfigPath("./")
+	viper.AddConfigPath("$HOME/.omega/")
 	err := viper.ReadInConfig()
 	if err != nil {
 		log.Error("can't read config file:", err)
