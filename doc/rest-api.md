@@ -4,10 +4,10 @@
  * [POST /search/jump](#searchjump): 根据一条日志查询日志上下文
 
 ##Search
-####POST `/search/index`
+####POST `/es/index`
 日志首页根据选择条件查询
 ```shell
-curl -X POST http://123.59.58.58:8080/search/index \
+curl -X POST http://123.59.58.58:8080/es/index \
         -H Authorization:usertoken \
         -H Content-Type:application/json -d '{
     "userid": 1,
@@ -21,9 +21,9 @@ curl -X POST http://123.59.58.58:8080/search/index \
     "keyword": "test"
 }'
 ```
-####POST `/search/jump`
+####POST `/es/jump`
 ```shell
-curl -X POST http://123.59.58.58:8080/search/jump \
+curl -X POST http://123.59.58.58:8080/es/jump \
         -H Authorization:usertoken \
         -H Content-Type:application/json -d '{
     "userid": 1,
