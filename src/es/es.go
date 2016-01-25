@@ -242,6 +242,12 @@ func SearchContext(c *echo.Context) error {
 			  },
 			  {
 			    "term": {"ipport": "` + ipport + `"}
+			  },
+			  {
+			    "term": {"typename": "` + appname + `"}
+			  },
+			  {
+			    "term": {"clusterid": "` + strconv.Itoa(int(clusterid)) + `"}
 			  }
 			]
 		      }
@@ -262,7 +268,8 @@ func SearchContext(c *echo.Context) error {
 	            }
 		  }`
 	esindex := "logstash-" + strconv.Itoa(int(userid)) + "-" + timestamp[:10]
-	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
+	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
+	estype := ""
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
 		log.Error("searchindex search es error: ", err)
