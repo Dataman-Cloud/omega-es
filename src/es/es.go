@@ -84,6 +84,9 @@ func SearchIndex(c *echo.Context) error {
 		          },
 			  {
                             "term": {"typename": "` + appname + `"}
+			  },
+			  {
+                            "term": {"clusterid": "` + strconv.Itoa(int(clusterid)) + `"}
 			  }`
 	if kok {
 		query += `,
@@ -134,7 +137,8 @@ func SearchIndex(c *echo.Context) error {
 	} else {
 		esindex += "*"
 	}
-	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
+	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
+	estype := ""
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
 		log.Error("searchindex search es error: ", err)
