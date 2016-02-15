@@ -2,19 +2,25 @@ package util
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"github.com/labstack/echo"
-	"net"
 	"net/http"
 	"strings"
-	"time"
-
-	"github.com/labstack/gommon/color"
 )
 
 func ReadBody(c *echo.Context) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	_, err := buf.ReadFrom(c.Request().Body)
+	if err != nil {
+		return nil, errors.New("read request body error")
+	}
+	return buf.Bytes(), nil
+}
+
+func ReadBodyRequest(h *http.Request) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	_, err := buf.ReadFrom(h.Body)
 	if err != nil {
 		return nil, errors.New("read request body error")
 	}
@@ -38,54 +44,21 @@ func ReturnError(c *echo.Context, data interface{}) error {
 	return c.JSON(http.StatusBadRequest, data)
 }
 
+func ReturnErrorResponse(w http.ResponseWriter, m map[string]interface{}) {
+	b, _ := json.Marshal(m)
+	w.Header()["Content-Type"] = []string{"application/json; charset=utf-8"}
+	w.Write(b)
+}
+
+func ReturnOKResponse(w http.ResponseWriter, m interface{}) {
+	b, _ := json.Marshal(m)
+	w.Header()["Content-Type"] = []string{"text/csv"}
+	w.Write(b)
+}
+
 func Header(c *echo.Context, key string) string {
 	if values, _ := c.Request().Header[key]; len(values) > 0 {
 		return values[0]
 	}
 	return ""
-}
-
-func Logger() echo.MiddlewareFunc {
-	return func(h echo.HandlerFunc) echo.HandlerFunc {
-		return func(c *echo.Context) error {
-			req := c.Request()
-			res := c.Response()
-			logger := c.Echo().Logger()
-
-			remoteAddr := req.RemoteAddr
-			if ip := req.Header.Get(echo.XRealIP); ip != "" {
-				remoteAddr = ip
-			} else if ip = req.Header.Get(echo.XForwardedFor); ip != "" {
-				remoteAddr = ip
-			} else {
-				remoteAddr, _, _ = net.SplitHostPort(remoteAddr)
-			}
-
-			start := time.Now()
-			if err := h(c); err != nil {
-				c.Error(err)
-			}
-			stop := time.Now()
-			method := req.Method
-			path := req.URL.Path
-			if path == "" {
-				path = "/"
-			}
-			size := res.Size()
-
-			n := res.Status()
-			code := color.Green(n)
-			switch {
-			case n >= 500:
-				code = color.Red(n)
-			case n >= 400:
-				code = color.Yellow(n)
-			case n >= 300:
-				code = color.Cyan(n)
-			}
-
-			logger.Info("%s %s %s %s %s %s %d", start.Format(time.RFC3339Nano), remoteAddr, method, path, code, stop.Sub(start), size)
-			return nil
-		}
-	}
 }
