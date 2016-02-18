@@ -126,7 +126,7 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 		  },
 		"sort": {"timestamp.sort": "asc"},
 		"from": ` + strconv.Itoa(int(from)) + `,
-		"size": 5,
+		"size": 10000,
 		"fields": ["timestamp","msg"],
 		"highlight": {
 	          "require_field_match": "true",
