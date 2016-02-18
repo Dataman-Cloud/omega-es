@@ -167,7 +167,7 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	}
 	content, _ := gabs.ParseJSON(out.RawJSON)
 	//hits, err := content.Path("hits.hits").Children()
-	ReturnOKResponse(w, content.Path("hits.hits").Data())
+	ReturnOKResponse(w, content.Path("hits.hits").String())
 	return
 	/*if err != nil {
 		log.Error("searchindex get hits error: ", err)
