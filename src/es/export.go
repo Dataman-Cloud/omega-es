@@ -4,8 +4,6 @@ import (
 	. "github.com/Dataman-Cloud/omega-es/src/util"
 	log "github.com/cihub/seelog"
 	"github.com/jeffail/gabs"
-	//"github.com/labstack/echo"
-	//ejson "encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -15,14 +13,12 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	body, err := ReadBodyRequest(h)
 	if err != nil {
 		log.Error("searchindex can't get request body")
-		//return ReturnError(c, map[string]string{"error": "searchindex can't get request body"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex can't get request body"})
 		return
 	}
 	json, err := gabs.ParseJSON(body)
 	if err != nil {
 		log.Error("searchindex param parse json error")
-		//return ReturnError(c, map[string]string{"error": "searchindex param parse json error"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex param parse json error"})
 		return
 	}
@@ -30,7 +26,6 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	userid, ok := json.Path("userid").Data().(float64)
 	if !ok {
 		log.Error("searchindex param can't found userid")
-		//return ReturnError(c, map[string]string{"error": "searchindex can't found userid"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex can't found userid"})
 		return
 	}
@@ -38,7 +33,6 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	clusterid, ok := json.Path("clusterid").Data().(float64)
 	if !ok {
 		log.Error("searchindex param can't found clusterid")
-		//return ReturnError(c, map[string]string{"error": "searchindex can't found clusterid"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex can't found clusterid"})
 		return
 	}
@@ -46,7 +40,6 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	appname, ok := json.Path("appname").Data().(string)
 	if !ok {
 		log.Error("searchindex param can't found appname")
-		//return ReturnError(c, map[string]string{"error": "searchindex can't found appname"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex can't found appname"})
 		return
 	}
@@ -54,7 +47,6 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	start, ok := json.Path("start").Data().(string)
 	if !ok {
 		log.Error("searchindex param can't found starttime")
-		//return ReturnError(c, map[string]string{"error": "searchindex can't found starttime"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex can't found starttime"})
 		return
 	}
@@ -62,7 +54,6 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	end, ok := json.Path("end").Data().(string)
 	if !ok {
 		log.Error("searchindex param can't found endtime")
-		//return ReturnError(c, map[string]string{"error": "searchindex can't found endtime"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex can't found endtime"})
 		return
 	}
@@ -70,7 +61,6 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	from, ok := json.Path("from").Data().(float64)
 	if !ok {
 		log.Error("searchindex param can't found from")
-		//return ReturnError(c, map[string]string{"error": "searchindex can't found from"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex can't found from"})
 		return
 	}
@@ -78,7 +68,6 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	size, ok := json.Path("size").Data().(float64)
 	if !ok {
 		log.Error("searchindex param can't found size")
-		//return ReturnError(c, map[string]string{"error": "searchindex can't found size"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex can't found size"})
 		return
 	}
@@ -86,7 +75,6 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 		size = 200
 	}
 
-	//ipport, iok := json.Path("ipport").Data().(string)
 	ipport, err := json.Path("ipport").Children()
 	keyword, kok := json.Path("keyword").Data().(string)
 
@@ -138,8 +126,8 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 		  },
 		"sort": {"timestamp.sort": "asc"},
 		"from": ` + strconv.Itoa(int(from)) + `,
-		"size": 10000,
-		"fields": ["timestamp","msg","ipport","ip","taskid","counter", "typename"],
+		"size": 5,
+		"fields": ["timestamp","msg"],
 		"highlight": {
 	          "require_field_match": "true",
 		  "fields": {
@@ -157,69 +145,43 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	} else {
 		esindex += "*"
 	}
-	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	estype := ""
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
 		log.Error("searchindex search es error: ", err)
-		//return ReturnError(c, map[string]string{"error": "searchindex search es error"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex search es error"})
 		return
 	}
-	content, _ := gabs.ParseJSON(out.RawJSON)
-	//hits, err := content.Path("hits.hits").Children()
-	ReturnOKResponse(w, content.Path("hits.hits").Data())
-	//b, _ := ejson.Marshal(content.Path("hits.hits").Data())
-	//ReturnOKResponse(w, string(b))
-	return
-	/*if err != nil {
-		log.Error("searchindex get hits error: ", err)
-		//return ReturnError(c, map[string]string{"error": "searchindex get hits error"})
-		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex get hits error"})
-		return
-	}
+	content, err := gabs.ParseJSON(out.RawJSON)
 	if err == nil {
-		if len(hits) > 0 {
-			for i, hit := range hits {
-				msgs, err := hit.Path("fields.msg").Children()
-				if err == nil {
-					msg := msgs[0].Data().(string)
-					msg = strings.Replace(msg, "&", "&amp;", -1)
-					msg = strings.Replace(msg, "<", "&lt;", -1)
-					msg = strings.Replace(msg, ">", "&gt;", -1)
-					msg = strings.Replace(msg, "\"", "&quot;", -1)
-					msg = strings.Replace(msg, " ", "&nbsp;", -1)
-					hits[i].Path("fields.msg").SetIndex(msg, 0)
-				} else {
-					continue
-				}
-			}
+		hits, _ := content.Path("hits.hits").Children()
+		var rdata []map[string]interface{}
+		for _, v := range hits {
+			rdata = append(rdata, map[string]interface{}{
+				"msg":       v.Path("fields.msg").Index(0).Data(),
+				"timestamp": v.Path("fields.timestamp").Index(0).Data(),
+			})
 		}
-
-		ReturnOKResponse(w, hits.Data())
+		ReturnOKResponse(w, rdata)
 		return
 	} else {
 		log.Error("searchindex get hits error: ", err)
-		//return ReturnError(c, map[string]string{"error": "searchindex get hits error"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex get hits error"})
 		return
 	}
-	//return ReturnOK(c, content.Data())
-	return*/
+	return
 }
 
 func ContextExport(w http.ResponseWriter, h *http.Request) {
 	body, err := ReadBodyRequest(h)
 	if err != nil {
 		log.Error("searchcontext can't get request body")
-		//return ReturnError(c, map[string]string{"error": "searchcontext can't get request body"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchcontext can't get request body"})
 		return
 	}
 	json, err := gabs.ParseJSON(body)
 	if err != nil {
 		log.Error("searchcontext param parse json error")
-		//return ReturnError(c, map[string]string{"error": "searchcontext param parse json error"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchcontext param parse json error"})
 		return
 	}
@@ -227,7 +189,6 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 	userid, ok := json.Path("userid").Data().(float64)
 	if !ok {
 		log.Error("searchcontext param can't found userid")
-		//return ReturnError(c, map[string]string{"error": "searchcontext can't found userid"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchcontext can't found userid"})
 		return
 	}
@@ -235,7 +196,6 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 	clusterid, ok := json.Path("clusterid").Data().(float64)
 	if !ok {
 		log.Error("searchcontext param can't found clusterid")
-		//return ReturnError(c, map[string]string{"error": "searchcontext can't found clusterid"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchcontext can't found clusterid"})
 		return
 	}
@@ -243,7 +203,6 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 	ipport, ok := json.Path("ipport").Data().(string)
 	if !ok {
 		log.Error("searchcontext param can't found ipport")
-		//return ReturnError(c, map[string]string{"error": "searchcontext can't found ipport"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchcontext can't found ipport"})
 		return
 	}
@@ -251,7 +210,6 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 	timestamp, ok := json.Path("timestamp").Data().(string)
 	if !ok {
 		log.Error("searchcontext param can't found timestamp")
-		//return ReturnError(c, map[string]string{"error": "searchcontext can't found timestamp"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchcontext can't found timestamp"})
 		return
 	}
@@ -259,7 +217,6 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 	counter, ok := json.Path("counter").Data().(float64)
 	if !ok {
 		log.Error("searchcontext param can't found counter")
-		//return ReturnError(c, map[string]string{"error": "searchcontext can't found counter"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchcontext can't found counter"})
 		return
 	}
@@ -267,7 +224,6 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 	appname, ok := json.Path("appname").Data().(string)
 	if !ok {
 		log.Error("searchcontext param can't found appname")
-		//return ReturnError(c, map[string]string{"error": "searchcontext can't found appname"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchcontext can't found appname"})
 		return
 	}
@@ -305,7 +261,7 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 		    "sort": {"timestamp.sort": "asc"},
 		    "from": 0,
 		    "size": 10000,
-		    "fields": ["timestamp","msg","ipport","ip","taskid","counter"],
+		    "fields": ["timestamp","msg"],
 		    "highlight": {
 	              "require_field_match": "true",
 		      "fields": {
@@ -318,51 +274,29 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 	            }
 		  }`
 	esindex := "logstash-" + strconv.Itoa(int(userid)) + "-" + timestamp[:10]
-	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	estype := ""
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
 		log.Error("searchindex search es error: ", err)
-		//return ReturnError(c, map[string]string{"error": "searchindex search es error"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex search es error"})
 		return
 	}
 	content, _ := gabs.ParseJSON(out.RawJSON)
-	ReturnOKResponse(w, content.Path("hits.hits").Data())
-	return
-	/*hits, err := content.Path("hits.hits").Children()
-	if err != nil {
-		log.Error("searchindex get hits error: ", err)
-		//return ReturnError(c, map[string]string{"error": "searchindex get hits error"})
-		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex get hits error"})
-		return
-	}
 	if err == nil {
-		if len(hits) > 0 {
-			for i, hit := range hits {
-				msgs, err := hit.Path("fields.msg").Children()
-				if err == nil {
-					msg := msgs[0].Data().(string)
-					log.Debug(msg)
-					msg = strings.Replace(msg, "&", "&amp;", -1)
-					msg = strings.Replace(msg, "<", "&lt;", -1)
-					msg = strings.Replace(msg, ">", "&gt;", -1)
-					msg = strings.Replace(msg, "\"", "&quot;", -1)
-					msg = strings.Replace(msg, " ", "&nbsp;", -1)
-					hits[i].Path("fields.msg").SetIndex(msg, 0)
-				} else {
-					continue
-				}
-			}
+		hits, _ := content.Path("hits.hits").Children()
+		var rdata []map[string]interface{}
+		for _, v := range hits {
+			rdata = append(rdata, map[string]interface{}{
+				"msg":       v.Path("fields.msg").Index(0).Data(),
+				"timestamp": v.Path("fields.timestamp").Index(0).Data(),
+			})
 		}
-		ReturnOKResponse(w, hits.Data())
+		ReturnOKResponse(w, rdata)
 		return
 	} else {
 		log.Error("searchindex get hits error: ", err)
-		//return ReturnError(c, map[string]string{"error": "searchindex get hits error"})
 		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex get hits error"})
 		return
 	}
-	//return ReturnOK(c, content.Data())
-	return*/
+	return
 }
