@@ -5,7 +5,7 @@ import (
 	log "github.com/cihub/seelog"
 	"github.com/jeffail/gabs"
 	//"github.com/labstack/echo"
-	ejson "encoding/json"
+	//ejson "encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
@@ -168,9 +168,9 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	}
 	content, _ := gabs.ParseJSON(out.RawJSON)
 	//hits, err := content.Path("hits.hits").Children()
-	//ReturnOKResponse(w, content.Path("hits.hits").String())
-	b, _ := ejson.Marshal(content.Path("hits.hits").Data())
-	ReturnOKResponse(w, string(b))
+	ReturnOKResponse(w, content.Path("hits.hits").Data())
+	//b, _ := ejson.Marshal(content.Path("hits.hits").Data())
+	//ReturnOKResponse(w, string(b))
 	return
 	/*if err != nil {
 		log.Error("searchindex get hits error: ", err)
