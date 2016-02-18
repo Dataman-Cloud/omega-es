@@ -22,14 +22,16 @@ func initEcho() {
 	addr := config.GetString("host") + ":" + config.GetString("port")
 	e := echo.New()
 
+	//e.Use(mw.Recover(), mw.Logger())
 	e.Use(mw.Recover(), mw.Logger(), auth)
 	//e.Use(mw.Recover(), util.Logger(), auth)
 
 	es := e.Group("/es")
 	{
 		es.Post("/index", SearchIndex)
-		es.Post("/index/download/log.json", IndexExport)
+		es.Post("/index/download", IndexExport)
 		es.Post("/context", SearchContext)
+		es.Post("/context/download", ContextExport)
 	}
 
 	log.Info("listening server address: ", addr)
