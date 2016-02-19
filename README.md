@@ -1,7 +1,7 @@
 # omega-es
 omega elasticsearch service
 
-### Building 
+### Building
 
 cd $GOPATH/src/github.com/Dataman-Cloud
 git clone git@github.com:Dataman-Cloud/omega-es.git
