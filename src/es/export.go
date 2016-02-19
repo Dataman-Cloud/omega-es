@@ -127,7 +127,7 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 		"sort": {"timestamp.sort": "asc"},
 		"from": ` + strconv.Itoa(int(from)) + `,
 		"size": 10000,
-		"fields": ["timestamp","msg"],
+		"fields": ["timestamp","ip","ipport","msg"],
 		"highlight": {
 	          "require_field_match": "true",
 		  "fields": {
@@ -261,7 +261,7 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 		    "sort": {"timestamp.sort": "asc"},
 		    "from": 0,
 		    "size": 10000,
-		    "fields": ["timestamp","msg"],
+		    "fields": ["timestamp","ip","ipport","msg"],
 		    "highlight": {
 	              "require_field_match": "true",
 		      "fields": {
