@@ -5,9 +5,25 @@ import (
 	log "github.com/cihub/seelog"
 	"github.com/jeffail/gabs"
 	"github.com/labstack/echo"
+	"net/http"
 	"strconv"
 	"strings"
+	"time"
 )
+
+func Health(c *echo.Context) error {
+	start := time.Now().UnixNano()
+	_, err := Conn.AllNodesInfo()
+	m := make(map[string]interface{})
+	if err == nil {
+		m["statue"] = 0
+	} else {
+		m["statue"] = 1
+	}
+	end := time.Now().UnixNano()
+	m["time"] = end - start
+	return c.JSON(http.StatusOK, m)
+}
 
 func SearchIndex(c *echo.Context) error {
 	body, err := ReadBody(c)

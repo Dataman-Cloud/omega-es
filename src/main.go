@@ -24,7 +24,6 @@ func initEcho() {
 
 	//e.Use(mw.Recover(), mw.Logger())
 	e.Use(mw.Recover(), mw.Logger(), auth)
-	//e.Use(mw.Recover(), util.Logger(), auth)
 
 	es := e.Group("/es")
 	{
@@ -32,6 +31,11 @@ func initEcho() {
 		es.Post("/index/download", IndexExport)
 		es.Post("/context", SearchContext)
 		es.Post("/context/download", ContextExport)
+	}
+
+	api := e.Group("/api/v2")
+	{
+		api.Get("/health", Health)
 	}
 
 	log.Info("listening server address: ", addr)
