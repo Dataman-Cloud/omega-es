@@ -160,6 +160,8 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 			rdata = append(rdata, map[string]interface{}{
 				"msg":       v.Path("fields.msg").Index(0).Data(),
 				"timestamp": v.Path("fields.timestamp").Index(0).Data(),
+				"ip":        v.Path("fields.ip").Index(0).Data(),
+				"ipport":    v.Path("fields.ipport").Index(0).Data(),
 			})
 		}
 		ReturnOKResponse(w, rdata)
@@ -289,6 +291,8 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 			rdata = append(rdata, map[string]interface{}{
 				"msg":       v.Path("fields.msg").Index(0).Data(),
 				"timestamp": v.Path("fields.timestamp").Index(0).Data(),
+				"ip":        v.Path("fields.ip").Index(0).Data(),
+				"ipport":    v.Path("fields.ipport").Index(0).Data(),
 			})
 		}
 		ReturnOKResponse(w, rdata)
