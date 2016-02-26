@@ -58,23 +58,6 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 		return
 	}
 
-	from, ok := json.Path("from").Data().(float64)
-	if !ok {
-		log.Error("searchindex param can't found from")
-		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex can't found from"})
-		return
-	}
-
-	size, ok := json.Path("size").Data().(float64)
-	if !ok {
-		log.Error("searchindex param can't found size")
-		ReturnErrorResponse(w, map[string]interface{}{"error": "searchindex can't found size"})
-		return
-	}
-	if size > 200 {
-		size = 200
-	}
-
 	ipport, err := json.Path("ipport").Children()
 	keyword, kok := json.Path("keyword").Data().(string)
 
@@ -163,6 +146,12 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 				"timestamp": v.Path("fields.timestamp").Index(0).Data(),
 				"ip":        v.Path("fields.ip").Index(0).Data(),
 				"ipport":    v.Path("fields.ipport").Index(0).Data(),
+			})
+		}
+
+		if len(rdata) == 0 {
+			rdata = append(rdata, map[string]interface{}{
+				"data": 0,
 			})
 		}
 		ReturnOKResponse(w, rdata)
@@ -294,6 +283,11 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 				"timestamp": v.Path("fields.timestamp").Index(0).Data(),
 				"ip":        v.Path("fields.ip").Index(0).Data(),
 				"ipport":    v.Path("fields.ipport").Index(0).Data(),
+			})
+		}
+		if len(rdata) == 0 {
+			rdata = append(rdata, map[string]interface{}{
+				"data": 0,
 			})
 		}
 		ReturnOKResponse(w, rdata)
