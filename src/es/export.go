@@ -125,7 +125,7 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 		    }
 		  },
 		"sort": {"timestamp.sort": "asc"},
-		"from": ` + strconv.Itoa(int(from)) + `,
+		"from": 0,
 		"size": 10000,
 		"fields": ["timestamp","ip","ipport","msg"],
 		"highlight": {
