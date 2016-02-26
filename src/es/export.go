@@ -146,6 +146,7 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 		esindex += "*"
 	}
 	estype := ""
+	log.Debug(esindex, estype, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
 		log.Error("searchindex search es error: ", err)
