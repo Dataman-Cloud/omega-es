@@ -155,6 +155,7 @@ func SearchIndex(c *echo.Context) error {
 	}
 	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	estype := ""
+	log.Debug(esindex, estype, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
 		log.Error("searchindex search es error: ", err)
