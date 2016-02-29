@@ -22,10 +22,10 @@ func initEcho() {
 	addr := config.GetString("host") + ":" + config.GetString("port")
 	e := echo.New()
 
-	//e.Use(mw.Recover(), mw.Logger())
-	e.Use(mw.Recover(), mw.Logger(), auth)
+	e.Use(mw.Recover(), mw.Logger())
+	//e.Use(mw.Recover(), mw.Logger(), auth)
 
-	es := e.Group("/es")
+	es := e.Group("/es", auth)
 	{
 		es.Post("/index", SearchIndex)
 		es.Post("/index/download", IndexExport)
@@ -33,9 +33,9 @@ func initEcho() {
 		es.Post("/context/download", ContextExport)
 	}
 
-	api := e.Group("/api/v2")
+	api := e.Group("/api/v3")
 	{
-		api.Get("/health", Health)
+		api.Get("/health/log", Health)
 	}
 
 	log.Info("listening server address: ", addr)
