@@ -122,7 +122,7 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 		  "fragment_size": -1
 		}
 	       }`
-	esindex := "logstash-" + strconv.Itoa(int(userid)) + "-"
+	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-"
 	if start[:10] == end[:10] {
 		esindex += start[:10]
 	} else {
@@ -265,7 +265,7 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 		      "fragment_size": -1
 	            }
 		  }`
-	esindex := "logstash-" + strconv.Itoa(int(userid)) + "-" + timestamp[:10]
+	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + timestamp[:10]
 	estype := ""
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
