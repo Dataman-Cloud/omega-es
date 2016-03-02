@@ -109,7 +109,7 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 		  },
 		"sort": {"timestamp.sort": "asc"},
 		"from": 0,
-		"size": 10000,
+		"size": 5000,
 		"fields": ["timestamp","ip","ipport","msg"],
 		"highlight": {
 	          "require_field_match": "true",
@@ -252,7 +252,7 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 		    },
 		    "sort": {"timestamp.sort": "asc"},
 		    "from": 0,
-		    "size": 10000,
+		    "size": 5000,
 		    "fields": ["timestamp","ip","ipport","msg"],
 		    "highlight": {
 	              "require_field_match": "true",
