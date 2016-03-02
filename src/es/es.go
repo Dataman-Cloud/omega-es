@@ -13,6 +13,10 @@ import (
 )
 
 func Health(c *echo.Context) error {
+	astart := time.Now().UnixNano()
+	ma := map[string]interface{}{
+		"status": 0,
+	}
 	start := time.Now().UnixNano()
 	_, err := Conn.AllNodesInfo()
 	mes := make(map[string]interface{})
@@ -20,9 +24,10 @@ func Health(c *echo.Context) error {
 		mes["status"] = 0
 	} else {
 		mes["status"] = 1
+		ma["status"] = 1
 	}
 	end := time.Now().UnixNano()
-	mes["time"] = end - start
+	mes["time"] = int((end - start) / 1000000)
 
 	mall := map[string]interface{}{
 		"elasticsearch": mes,
@@ -37,10 +42,14 @@ func Health(c *echo.Context) error {
 		mredis["status"] = 0
 	} else {
 		mredis["status"] = 1
+		ma["status"] = 1
 	}
 	end = time.Now().UnixNano()
-	mredis["time"] = end - start
+	mredis["time"] = int((end - start) / 1000000)
 	mall["redis"] = mredis
+	aend := time.Now().UnixNano()
+	ma["time"] = int((aend - astart) / 1000000)
+	mall["omegaEs"] = ma
 	return c.JSON(http.StatusOK, mall)
 }
 
