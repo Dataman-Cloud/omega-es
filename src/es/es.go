@@ -3,6 +3,7 @@ package es
 import (
 	. "github.com/Dataman-Cloud/omega-es/src/util"
 	log "github.com/cihub/seelog"
+	"github.com/garyburd/redigo/redis"
 	"github.com/jeffail/gabs"
 	"github.com/labstack/echo"
 	"net/http"
@@ -14,15 +15,33 @@ import (
 func Health(c *echo.Context) error {
 	start := time.Now().UnixNano()
 	_, err := Conn.AllNodesInfo()
-	m := make(map[string]interface{})
+	mes := make(map[string]interface{})
 	if err == nil {
-		m["statue"] = 0
+		mes["status"] = 0
 	} else {
-		m["statue"] = 1
+		mes["status"] = 1
 	}
 	end := time.Now().UnixNano()
-	m["time"] = end - start
-	return c.JSON(http.StatusOK, m)
+	mes["time"] = end - start
+
+	mall := map[string]interface{}{
+		"elasticsearch": mes,
+	}
+
+	start = time.Now().UnixNano()
+	conn := Open()
+	defer conn.Close()
+	mredis := make(map[string]interface{})
+	_, err = redis.String(conn.Do("PING"))
+	if err == nil {
+		mredis["status"] = 0
+	} else {
+		mredis["status"] = 1
+	}
+	end = time.Now().UnixNano()
+	mredis["time"] = end - start
+	mall["redis"] = mredis
+	return c.JSON(http.StatusOK, mall)
 }
 
 func SearchIndex(c *echo.Context) error {
