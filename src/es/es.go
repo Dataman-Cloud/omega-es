@@ -123,7 +123,7 @@ func SearchIndex(c *echo.Context) error {
 		query += `,
 			  {
 			    "terms": {
-			      "ipport": ["` + strings.Join(arr, ",") + `"],
+			      "ipport": ["` + strings.Join(arr, "\",\"") + `"],
 			      "minimum_match": 1
 			  }
 			}`

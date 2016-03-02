@@ -98,7 +98,7 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 		query += `,
 			  {
 			    "terms": {
-			      "ipport": ["` + strings.Join(arr, ",") + `"],
+			      "ipport": ["` + strings.Join(arr, "\",\"") + `"],
 			      "minimum_match": 1
 			  }
 			}`
