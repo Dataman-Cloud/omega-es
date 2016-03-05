@@ -36,7 +36,7 @@ curl -X POST http://123.59.58.58:8080/es/content \
 ```
 ####POST `/es/index/download`
 ```shell
-curl -X POST http://10.3.11.22:9200/es/index/download/log.json \
+curl -X POST http://10.3.11.22:9200/es/index/download \
         -H Authorization:usertoken \
         -H Content-Type:application/json -d '{
     "userid": 1,
