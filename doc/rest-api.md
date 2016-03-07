@@ -18,7 +18,8 @@ curl -X POST http://123.59.58.58:8080/es/index \
     "from": 0,
     "size": 20,
     "ipport": "10.3.11.18:[31757]",
-    "keyword": "test"
+    "keyword": "test",
+    "source": "echo"
 }'
 ```
 ####POST `/es/content`
@@ -31,7 +32,8 @@ curl -X POST http://123.59.58.58:8080/es/content \
     "appname": "htmltest",
     "timestamp": "2015-12-30T16:08:07.272+08:00",
     "ipport": "10.3.11.18:[31092]",
-    "counter": 3
+    "counter": 3,
+    "source": "echo"
 }'
 ```
 ####POST `/es/index/download`
@@ -45,7 +47,8 @@ curl -X POST http://10.3.11.22:9200/es/index/download \
     "start": "2015-12-30T14:16:56.644+08:00",
     "end": "2015-12-30T14:19:56.643+08:00",
     "ipport": "10.3.11.18:[31757]",
-    "keyword": "test"
+    "keyword": "test",
+    "source": "echo"
 }'
 ```
 ####POST `/es/content/download`
@@ -58,6 +61,7 @@ curl -X POST http://123.59.58.58:8080/es/content/download \
     "appname": "htmltest",
     "timestamp": "2015-12-30T16:08:07.272+08:00",
     "ipport": "10.3.11.18:[31092]",
-    "counter": 3
+    "counter": 3,
+    "source": "echo"
 }'
 ```
