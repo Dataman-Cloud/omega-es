@@ -112,6 +112,7 @@ func SearchIndex(c *echo.Context) error {
 
 	//ipport, iok := json.Path("ipport").Data().(string)
 	ipport, err := json.Path("ipport").Children()
+	source, serr := json.Path("source").Children()
 	keyword, kok := json.Path("keyword").Data().(string)
 
 	query := `{
@@ -152,6 +153,19 @@ func SearchIndex(c *echo.Context) error {
 			  {
 			    "terms": {
 			      "ipport": ["` + strings.Join(arr, "\",\"") + `"],
+			      "minimum_match": 1
+			  }
+			}`
+	}
+	if serr == nil && len(source) > 0 {
+		var arr []string
+		for _, sour := range source {
+			arr = append(arr, sour.Data().(string))
+		}
+		query += `,
+			  {
+			    "terms": {
+			      "source": ["` + strings.Join(arr, "\",\"") + `"],
 			      "minimum_match": 1
 			  }
 			}`
@@ -249,6 +263,12 @@ func SearchContext(c *echo.Context) error {
 		return ReturnError(c, map[string]string{"error": "searchcontext can't found ipport"})
 	}
 
+	source, ok := json.Path("source").Data().(string)
+	if !ok {
+		log.Error("searchcontext param can't found source")
+		return ReturnError(c, map[string]string{"error": "searchcontext can't found source"})
+	}
+
 	timestamp, ok := json.Path("timestamp").Data().(string)
 	if !ok {
 		log.Error("searchcontext param can't found timestamp")
@@ -286,10 +306,13 @@ func SearchContext(c *echo.Context) error {
 			    }
 			  },
 			  {
+			    "term": {"typename": "` + appname + `"}
+			  },
+			  {
 			    "term": {"ipport": "` + ipport + `"}
 			  },
 			  {
-			    "term": {"typename": "` + appname + `"}
+			    "term": {"source": "` + source + `"}
 			  },
 			  {
 			    "term": {"clusterid": "` + strconv.Itoa(int(clusterid)) + `"}

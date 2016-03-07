@@ -59,6 +59,7 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	}
 
 	ipport, err := json.Path("ipport").Children()
+	source, serr := json.Path("source").Children()
 	keyword, kok := json.Path("keyword").Data().(string)
 
 	query := `{
@@ -99,6 +100,19 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 			  {
 			    "terms": {
 			      "ipport": ["` + strings.Join(arr, "\",\"") + `"],
+			      "minimum_match": 1
+			  }
+			}`
+	}
+	if serr == nil && len(source) > 0 {
+		var arr []string
+		for _, sour := range source {
+			arr = append(arr, sour.Data().(string))
+		}
+		query += `,
+			  {
+			    "terms": {
+			      "source": ["` + strings.Join(arr, "\",\"") + `"],
 			      "minimum_match": 1
 			  }
 			}`
@@ -199,6 +213,13 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 		return
 	}
 
+	source, ok := json.Path("source").Data().(string)
+	if !ok {
+		log.Error("searchcontext param can't found source")
+		ReturnErrorResponse(w, map[string]interface{}{"error": "searchcontext can't found source"})
+		return
+	}
+
 	timestamp, ok := json.Path("timestamp").Data().(string)
 	if !ok {
 		log.Error("searchcontext param can't found timestamp")
@@ -239,10 +260,13 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 			    }
 			  },
 			  {
+			    "term": {"typename": "` + appname + `"}
+			  },
+			  {
 			    "term": {"ipport": "` + ipport + `"}
 			  },
 			  {
-			    "term": {"typename": "` + appname + `"}
+			    "term": {"source": "` + source + `"}
 			  },
 			  {
 			    "term": {"clusterid": "` + strconv.Itoa(int(clusterid)) + `"}
