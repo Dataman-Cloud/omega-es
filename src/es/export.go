@@ -140,7 +140,7 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 	estype := ""
 	if start[:10] == end[:10] {
 		esindex += start[:10]
-		estype = "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
+		//estype = "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	} else {
 		esindex += "*"
 	}
@@ -291,8 +291,8 @@ func ContextExport(w http.ResponseWriter, h *http.Request) {
 	            }
 		  }`
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + timestamp[:10]
-	//estype := ""
-	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
+	estype := ""
+	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
 		log.Error("searchindex search es error: ", err)
