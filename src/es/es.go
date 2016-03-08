@@ -193,7 +193,7 @@ func SearchIndex(c *echo.Context) error {
 	estype := ""
 	if start[:10] == end[:10] {
 		esindex += start[:10]
-		estype = "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
+		//estype = "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	} else {
 		esindex += "*"
 	}
