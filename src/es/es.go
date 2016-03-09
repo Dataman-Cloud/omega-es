@@ -177,7 +177,7 @@ func SearchIndex(c *echo.Context) error {
 		"sort": {"timestamp.sort": "asc"},
 		"from": ` + strconv.Itoa(int(from)) + `,
 		"size": ` + strconv.Itoa(int(size)) + `,
-		"fields": ["timestamp","msg","ipport","ip","taskid","counter", "typename"],
+		"fields": ["timestamp","msg","ipport","ip","taskid","counter", "typename", "source"],
 		"highlight": {
 	          "require_field_match": "true",
 		  "fields": {
