@@ -24,8 +24,8 @@ func initEcho() {
 
 	e.Use(mw.Recover(), mw.Logger())
 
-	//es := e.Group("/es")
-	es := e.Group("/es", auth)
+	es := e.Group("/es")
+	//es := e.Group("/es", auth)
 	{
 		es.Post("/index", SearchIndex)
 		es.Post("/index/download", IndexExport)
