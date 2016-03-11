@@ -20,6 +20,7 @@ func ExportIndex(c *echo.Context) error {
 	ipport := strings.Split(c.Query("ipport"), ",")
 	source := strings.Split(c.Query("source"), ",")
 	keyword := c.Query("keyword")
+	log.Debug("--------------", start, "-----", end)
 	query := `{
 			    "query": {
 			      "bool": {
