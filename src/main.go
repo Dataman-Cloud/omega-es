@@ -24,8 +24,8 @@ func initEcho() {
 
 	e.Use(mw.Recover(), mw.Logger())
 
-	es := e.Group("/es")
-	//es := e.Group("/es", auth)
+	//es := e.Group("/es")
+	es := e.Group("/es", auth)
 	{
 		es.Post("/index", SearchIndex)
 		es.Post("/index/download", IndexExport)
@@ -34,6 +34,9 @@ func initEcho() {
 		es.Post("/seniorsearch/:userId", SeniorSearch)
 		es.Get("/appagg/:userId", AppAgg)
 		es.Get("/topagg/:field/:userId", TopAgg)
+	}
+	download := e.Group("/download")
+	{
 		es.Get("/index/log", ExportIndex)
 		es.Get("/context/log", ExportContext)
 	}
