@@ -35,7 +35,7 @@ func initEcho() {
 		es.Get("/appagg/:userId", AppAgg)
 		es.Get("/topagg/:field/:userId", TopAgg)
 	}
-	download := e.Group("/download")
+	download := e.Group("/es/download")
 	{
 		es.Get("/index/log", ExportIndex)
 		es.Get("/context/log", ExportContext)
