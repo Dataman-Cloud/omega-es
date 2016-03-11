@@ -49,7 +49,7 @@ func ExportIndex(c *echo.Context) error {
 	                            }
 				  }`
 	}
-	if len(ipport) > 0 {
+	if c.Query("ipport") != "" {
 		var arr []string
 		for _, ipp := range ipport {
 			arr = append(arr, ipp)
@@ -62,7 +62,7 @@ func ExportIndex(c *echo.Context) error {
 				  }
 				}`
 	}
-	if len(source) > 0 {
+	if c.Query("source") != "" {
 		var arr []string
 		for _, sour := range source {
 			arr = append(arr, sour)
