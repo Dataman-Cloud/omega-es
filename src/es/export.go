@@ -12,15 +12,14 @@ import (
 )
 
 func ExportIndex(c *echo.Context) error {
-	uid := c.Query("uid")
-	cid := c.Query("cid")
+	uid := c.Query("userid")
+	cid := c.Query("clusterid")
 	appname := c.Query("appname")
 	start := c.Query("start")
 	end := c.Query("end")
 	ipport := strings.Split(c.Query("ipport"), ",")
 	source := strings.Split(c.Query("source"), ",")
 	keyword := c.Query("keyword")
-	log.Debug("--------------", start, "-----", end)
 	query := `{
 			    "query": {
 			      "bool": {
@@ -314,8 +313,8 @@ func IndexExport(w http.ResponseWriter, h *http.Request) {
 }
 
 func ExportContext(c *echo.Context) error {
-	uid := c.Query("uid")
-	cid := c.Query("cid")
+	uid := c.Query("userid")
+	cid := c.Query("clusterid")
 	ipport := c.Query("ipport")
 	source := c.Query("source")
 	timestamp := c.Query("timestamp")
