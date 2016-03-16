@@ -351,10 +351,14 @@ func ExportContext(c *echo.Context) error {
 			  },
 			  {
 			    "term": {"ipport": "` + ipport + `"}
-			  },
+			  },`
+	if source != "" {
+		query += `
 			  {
 			    "term": {"source": "` + source + `"}
-			  },
+			  },`
+	}
+	query += `
 			  {
 			    "term": {"clusterid": "` + cid + `"}
 			  }

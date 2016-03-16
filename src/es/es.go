@@ -263,10 +263,10 @@ func SearchContext(c *echo.Context) error {
 		return ReturnError(c, map[string]string{"error": "searchcontext can't found ipport"})
 	}
 
-	source, ok := json.Path("source").Data().(string)
-	if !ok {
+	source, sok := json.Path("source").Data().(string)
+	if !sok {
 		log.Error("searchcontext param can't found source")
-		return ReturnError(c, map[string]string{"error": "searchcontext can't found source"})
+		//return ReturnError(c, map[string]string{"error": "searchcontext can't found source"})
 	}
 
 	timestamp, ok := json.Path("timestamp").Data().(string)
@@ -307,10 +307,15 @@ func SearchContext(c *echo.Context) error {
 			  },
 			  {
 			    "term": {"typename": "` + appname + `"}
-			  },
+			  },`
+	if sok {
+		query += `
 			  {
 			    "term": {"source": "` + source + `"}
 			  },
+			  `
+	}
+	query += `
 			  {
 			    "term": {"ipport": "` + ipport + `"}
 			  },
