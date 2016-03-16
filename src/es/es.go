@@ -338,6 +338,7 @@ func SearchContext(c *echo.Context) error {
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + timestamp[:10]
 	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	estype := ""
+	log.Debug(esindex, estype, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
 		log.Error("searchindex search es error: ", err)
@@ -355,7 +356,6 @@ func SearchContext(c *echo.Context) error {
 				msgs, err := hit.Path("fields.msg").Children()
 				if err == nil {
 					msg := msgs[0].Data().(string)
-					log.Debug(msg)
 					msg = strings.Replace(msg, "&", "&amp;", -1)
 					msg = strings.Replace(msg, "<", "&lt;", -1)
 					msg = strings.Replace(msg, ">", "&gt;", -1)
