@@ -28,9 +28,7 @@ func initEcho() {
 	es := e.Group("/es", auth)
 	{
 		es.Post("/index", SearchIndex)
-		es.Post("/index/download", IndexExport)
 		es.Post("/context", SearchContext)
-		es.Post("/context/download", ContextExport)
 		es.Post("/seniorsearch/:userId", SeniorSearch)
 		es.Get("/appagg/:userId", AppAgg)
 		es.Get("/topagg/:field/:userId", TopAgg)
