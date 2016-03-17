@@ -131,6 +131,7 @@ func ExportIndex(c *echo.Context) error {
 		b, _ := json.Marshal(rdata)
 		c.Response().Header()["Content-Type"] = []string{"text/csv"}
 		c.Response().Header()["Content-Disposition"] = []string{"attachment;filename=log.json"}
+		b, _ = FormatJson(b)
 		c.Response().Write(b)
 		return nil
 		//ReturnOK(w, rdata)
