@@ -8,8 +8,22 @@ log:
     formatter: "text"
     maxSize: 1024000
 es:
-    hosts: "10.3.37.6"
+    hosts: "10.3.20.54"
     port: 9200
 redis:
     host: "10.3.37.16"
-    port: 6379        
+    port: 6379
+mysql:
+    host: "10.3.20.53" 
+    port: 3306
+    maxIdleConns: 5
+    maxOpenConns: 50
+    database: "oapp"
+    username: "root"
+    password: "dataman1234"
+chronos:
+    host: "10.3.20.55"
+    port: 5097
+scheduler:
+    host: "10.3.20.53"
+    port: 5009
