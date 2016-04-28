@@ -45,13 +45,16 @@ func upgradeDB() {
 			log.Error("db err", err)
 		}
 		log.Error("can't upgrade db", errors)
+		log.Flush()
 		//panic(-1)
 	}
 	if !ok {
 		log.Error("can't upgrade db")
+		log.Flush()
 		//panic(-1)
 	}
 	log.Info("DB upgraded")
+	log.Flush()
 }
 
 func InitDB() (*sqlx.DB, error) {
