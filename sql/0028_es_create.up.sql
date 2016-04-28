@@ -1,18 +1,5 @@
 use oapp;
 
-/*CREATE TABLE if not exists watcher (
-	  id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-	  uid varchar(64) NOT NULL,
-	  utype varchar(64) NOT NULL,
-	  wname varchar(64) NOT NULL,
-	  wbody text,
-	  cwname varchar(65) NOT NULL,
-	  wemails text,
-	  notify tinyint(1) NOT NULL,
-	  PRIMARY KEY (id),
-	  UNIQUE KEY uid (uid,utype,wname)
-);*/
-
 CREATE TABLE if not exists alarm (
 	id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	uid bigint(20) NOT NULL,
