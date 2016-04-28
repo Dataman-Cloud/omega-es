@@ -30,6 +30,7 @@ func DB() *sqlx.DB {
 }
 
 func upgradeDB() {
+	log.Debug("-------", config.GetConfig().Mc.UserName, config.GetConfig().Mc.Host, config.GetConfig().Mc.Port)
 	uri := fmt.Sprintf("mysql://%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Local",
 		config.GetConfig().Mc.UserName,
 		config.GetConfig().Mc.PassWord,
