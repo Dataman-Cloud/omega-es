@@ -1,4 +1,5 @@
-use oapp;
+create database if not exists datamanalarm;
+use datamanalarm;
 
 CREATE TABLE if not exists alarm (
 	id bigint(20) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
