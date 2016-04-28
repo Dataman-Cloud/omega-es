@@ -152,7 +152,7 @@ func CountAlarmHistory(uid int64, keyword string) (int, error) {
 	db := util.DB()
 
 	count := 0
-	sql := `select count(*) from alarmhistory as ah, alarm as a where ah.jobid = a.id and uid = ? and a.appname like '%` + keyword + `%'`
+	sql := `select count(*) from alarmhistory as ah, alarm as a where ah.jobid = a.id and ah.isalarm = true and a.uid = ? and a.appname like '%` + keyword + `%'`
 	err := db.Get(&count, sql, uid)
 	return count, err
 }
@@ -164,15 +164,25 @@ func GetHistoryByJobId(uid, pcount, pnum int64, sortby, order, keyword string) (
 	if pnum <= 0 {
 		pnum = 1
 	}
-	if sortby == "" {
+	if sortby == "" || sortby == "exectime" {
 		sortby = "ah.exectime"
+	} else if sortby == "keyword" {
+		sortby = "a.keyword"
+	} else if sortby == "resultnum" {
+		sortby = "ah.resultnum"
+	} else if sortby == "jobid" {
+		sortby = "ah.jobid"
+	} else if sortby == "appname" {
+		sortby = "a.appname"
+	} else if sortby == "id" {
+		sortby = "ah.id"
 	}
 	if order == "" {
 		order = "asc"
 	}
 	db := util.DB()
 	historys := []model.AlarmHistory{}
-	sql := `select ah.id as id, ah.jobid as jobid, ah.isalarm as isalarm, ah.exectime as exectime, ah.resultnum as resultnum, a.appname as appname, a.gtnum as gtnum, a.ival as ival from alarmhistory as ah, alarm as a where ah.jobid = a.id and ah.uid = ?`
+	sql := `select ah.id as id, ah.jobid as jobid, ah.isalarm as isalarm, ah.exectime as exectime, ah.resultnum as resultnum, a.appname as appname, a.gtnum as gtnum, a.ival as ival, a.keyword as keyword from alarmhistory as ah, alarm as a where ah.jobid = a.id and ah.isalarm = true and a.uid = ?`
 	if keyword != "" {
 		sql = sql + ` and a.appname like '%` + keyword + `%'`
 	}

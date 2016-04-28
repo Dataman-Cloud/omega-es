@@ -301,9 +301,10 @@ func JobExec(c *echo.Context) error {
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "Illegal request"})
 	}
 
+	endtime := time.Now().Unix()
+	starttime := endtime - int64(interval)*60
 	query := `{"query":{"bool":{"must":[{"match":{"msg":{"query":"` + keyword +
-		`","analyzer":"ik"}}},{"range":{"timestamp":{"gte":"now - ` + strconv.Itoa(int(interval)) +
-		`m","lte":"now"}}}]}}}`
+		`","analyzer":"ik"}}},{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) + `","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}`
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + time.Now().String()[:10]
 	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	out, err := Conn.Count(esindex, estype, nil, query)
@@ -323,12 +324,12 @@ func JobExec(c *echo.Context) error {
 	}
 	if int64(out.Count) >= alarm.GtNum {
 		alarmHistory.IsAlarm = true
+		if _, err = dao.AddAlaramHistory(alarmHistory); err != nil {
+			log.Errorf("exec chronos job insert into alarm history error: %v", err)
+			return ReturnError(c, map[string]interface{}{"code": 17012, "data": "exec chronos job insert into alarm history error: " + err.Error()})
+		}
 	} else {
 		alarmHistory.IsAlarm = false
-	}
-	if _, err = dao.AddAlaramHistory(alarmHistory); err != nil {
-		log.Errorf("exec chronos job insert into alarm history error: %v", err)
-		return ReturnError(c, map[string]interface{}{"code": 17012, "data": "exec chronos job insert into alarm history error: " + err.Error()})
 	}
 	return ReturnOK(c, map[string]interface{}{"code": 1, "data": "add alarm history successful"})
 }
