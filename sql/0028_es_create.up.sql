@@ -14,8 +14,7 @@ CREATE TABLE if not exists alarm (
 	keyword varchar(120) NOT NULL,
 	emails varchar(120) NOT NULL,
 	aliasname varchar(120) NOT NULL,
-	createtime timestamp,
-	UNIQUE KEY uniquekey (uid,usertype,alarmname)
+	createtime timestamp
 );
 
 CREATE TABLE if not exists alarmhistory (
