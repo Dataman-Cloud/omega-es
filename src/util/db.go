@@ -49,7 +49,7 @@ func upgradeDB() {
 	}
 	if !ok {
 		log.Error("can't upgrade db")
-		panic(-1)
+		//panic(-1)
 	}
 	log.Info("DB upgraded")
 }
