@@ -2,16 +2,25 @@ package util
 
 import (
 	"bytes"
+	"crypto/md5"
+	"encoding/base32"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/labstack/echo"
+	"io"
 	"net/http"
 	"strings"
 )
 
 func ReadBody(c *echo.Context) ([]byte, error) {
+	b, err := ReadResponseBody(c.Request().Body)
+	return b, err
+}
+
+func ReadResponseBody(body io.ReadCloser) ([]byte, error) {
 	buf := new(bytes.Buffer)
-	_, err := buf.ReadFrom(c.Request().Body)
+	_, err := buf.ReadFrom(body)
 	if err != nil {
 		return nil, errors.New("read request body error")
 	}
@@ -67,4 +76,18 @@ func FormatJson(b []byte) ([]byte, error) {
 	var out bytes.Buffer
 	err := json.Indent(&out, b, "", "  ")
 	return out.Bytes(), err
+}
+
+func EncodAlias(alarmname, usertype string, uid int64) string {
+	alias := base32.StdEncoding.EncodeToString([]byte(alarmname + "_" + usertype + "_" + fmt.Sprintf("%d", uid)))
+	return strings.Replace(strings.ToLower(alias), "=", "0", -1)
+}
+
+func SchdulerAuth(usertype, alarmname string, uid int64) string {
+	an := fmt.Sprintf("%s-%s-%d", alarmname, usertype, uid)
+	ana := fmt.Sprintf("%x", md5.Sum([]byte(an)))
+	anb := base32.StdEncoding.EncodeToString([]byte(ana + "****"))
+	anc := fmt.Sprintf("%x", md5.Sum([]byte(anb+"-+-+")))
+	return anc
+
 }

@@ -65,3 +65,33 @@ curl -X POST http://123.59.58.58:8080/es/content/download \
     "source": "echo"
 }'
 ```
+
+####POST `/es/alarm/create`
+创建报警策略
+```shell
+curl -X POST http://10.3.20.53:5009/es/alarm/create \
+	-H Authorization:usertoken \
+	-H Content-Type:application/json -d '{
+    "userid": 1,
+    "clusterid": 1,
+    "appname": "testalarm",
+    "interval": 5,
+    "gtnum": 10,
+    "alarmname": "alarmtest",
+    "usertype": "user",
+    "keyword": "error",
+    "emails": "yqguo@dataman-inc.com"
+}'
+```
+
+####DELETE `/es/alarm/delete/:id`
+删除报警策略
+`curl -X -H Authorization:usertoken DELETE http://10.3.20.53:5009/es/alarm/delete/:id`
+
+####GET `/es/alarm/list?usertype=usertype&uid=uid&pcount=pcount&pnum=pnum`
+查看创建策略列表
+`curl -X -H Authorization:usertoken GET http://10.3.20.53:5009/es/alarm/list?usertype=usertype&uid=uidpcount=pcount&pnum=pnum`
+
+####GET `/es/alarm/scheduler/history?jobid=jobid&pcount=pcount&pnum=pnum`
+查看策略执行历史记录
+`curl  -X -H Authorization:usertoken GET http://10.3.20.53:5009/es/alarm/scheduler/history?id=id&pcount=pcount&pnum=pnum`

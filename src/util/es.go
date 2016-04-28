@@ -4,6 +4,7 @@ import (
 	"github.com/Dataman-Cloud/omega-es/src/config"
 	log "github.com/cihub/seelog"
 	es "github.com/mattbaird/elastigo/lib"
+	//"net/http"
 	"strings"
 )
 

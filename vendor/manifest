@@ -8,6 +8,13 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/Jeffail/gabs",
+			"repository": "https://github.com/Jeffail/gabs",
+			"revision": "ee1575a53249b51d636e62464ca43a13030afdb5",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/araddon/gou",
 			"repository": "https://github.com/araddon/gou",
 			"revision": "5e9110908156ae10fe90dd01d6c9fcbe058a6c9e",
@@ -40,6 +47,13 @@
 			"path": "/redis"
 		},
 		{
+			"importpath": "github.com/go-sql-driver/mysql",
+			"repository": "https://github.com/go-sql-driver/mysql",
+			"revision": "7ebe0a500653eeb1859664bed5e48dec1e164e73",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/hashicorp/hcl",
 			"repository": "https://github.com/hashicorp/hcl",
 			"revision": "578dd9746824a54637686b51a41bad457a56bcef",
@@ -56,6 +70,13 @@
 			"repository": "https://github.com/jessevdk/go-flags",
 			"revision": "d91b7c5a5ce0b1d99d765ec3fb20ab590e52ddcb",
 			"branch": "master"
+		},
+		{
+			"importpath": "github.com/jmoiron/sqlx",
+			"repository": "https://github.com/jmoiron/sqlx",
+			"revision": "398dd5876282499cdfd4cb8ea0f31a672abe9495",
+			"branch": "master",
+			"notests": true
 		},
 		{
 			"importpath": "github.com/kr/pretty",
@@ -103,6 +124,54 @@
 			"path": "/lib"
 		},
 		{
+			"importpath": "github.com/mattes/migrate/driver",
+			"repository": "https://github.com/mattes/migrate",
+			"revision": "ce1b59bb819416ca67422929b1cb48bb342720b6",
+			"branch": "master",
+			"path": "/driver",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattes/migrate/driver/mysql",
+			"repository": "https://github.com/mattes/migrate",
+			"revision": "ce1b59bb819416ca67422929b1cb48bb342720b6",
+			"branch": "master",
+			"path": "/driver/mysql",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattes/migrate/file",
+			"repository": "https://github.com/mattes/migrate",
+			"revision": "ce1b59bb819416ca67422929b1cb48bb342720b6",
+			"branch": "master",
+			"path": "/file",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattes/migrate/migrate",
+			"repository": "https://github.com/mattes/migrate",
+			"revision": "ce1b59bb819416ca67422929b1cb48bb342720b6",
+			"branch": "master",
+			"path": "/migrate",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattes/migrate/migrate/direction",
+			"repository": "https://github.com/mattes/migrate",
+			"revision": "ce1b59bb819416ca67422929b1cb48bb342720b6",
+			"branch": "master",
+			"path": "/migrate/direction",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/mattes/migrate/pipe",
+			"repository": "https://github.com/mattes/migrate",
+			"revision": "ce1b59bb819416ca67422929b1cb48bb342720b6",
+			"branch": "master",
+			"path": "/pipe",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/mattn/go-colorable",
 			"repository": "https://github.com/mattn/go-colorable",
 			"revision": "3dac7b4f76f6e17fb39b768b89e3783d16e237fe",
@@ -119,6 +188,13 @@
 			"repository": "https://github.com/mitchellh/mapstructure",
 			"revision": "281073eb9eb092240d33ef253c404f1cca550309",
 			"branch": "master"
+		},
+		{
+			"importpath": "github.com/sluu99/uuid",
+			"repository": "https://github.com/sluu99/uuid",
+			"revision": "1dd34a9ad6c0e8dec93107f9c7425ea5713f78e1",
+			"branch": "master",
+			"notests": true
 		},
 		{
 			"importpath": "github.com/spf13/cast",

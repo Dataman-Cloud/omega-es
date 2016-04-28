@@ -19,12 +19,13 @@ func main() {
 
 func initEcho() {
 	log.Info("echo framework starting...")
-	addr := config.GetString("host") + ":" + config.GetString("port")
+	addr := ":" + config.GetString("port")
 	e := echo.New()
 
 	e.Use(mw.Recover(), mw.Logger())
 
-	//es := e.Group("/es")
+	//e.Use(CrossDomain)
+
 	es := e.Group("/es", auth)
 	{
 		es.Post("/index", SearchIndex)
@@ -33,6 +34,23 @@ func initEcho() {
 		es.Get("/appagg/:userId", AppAgg)
 		es.Get("/topagg/:field/:userId", TopAgg)
 	}
+
+	ea := e.Group("/es/alarm", auth)
+	{
+		ea.Post("/create", CreateLogAlarm)
+		ea.Delete("/delete/:id", DeleteAlarm)
+		ea.Get("/list", GetAlarms)
+		ea.Get("/scheduler/history", GetAlarmHistory)
+	}
+
+	/*ew := e.Group("/es/watcher")
+	{
+		ew.Post("/create", CreateWatcher)
+		ew.Post("/delete", DeleteWatcher)
+		ew.Get("/list/:usertype/:userid", GetWatchers)
+		ew.Post("/history", GetWatcherHistory)
+	}*/
+
 	ed := e.Group("/es/download")
 	{
 		ed.Get("/index/log", ExportIndex)
@@ -42,6 +60,7 @@ func initEcho() {
 	api := e.Group("/api/v3")
 	{
 		api.Get("/health/log", Health)
+		api.Post("/scheduler", JobExec)
 	}
 
 	log.Info("listening server address: ", addr)
@@ -53,6 +72,18 @@ func initEcho() {
 		MaxHeaderBytes: 1 << 20,
 	}
 	s.ListenAndServe()
+}
+
+func CrossDomain(c *echo.Context) error {
+	c.Response().Header().Set("Access-Control-Allow-Origin", "*")
+	c.Request().Header.Set("Access-Control-Allow-Credentials", "true")
+	c.Request().Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+	c.Request().Header.Set("Access-Control-Allow-Headers", "Content-Type, Depth, User-Agent, X-File-Size, X-Requested-With, X-Requested-By, If-Modified-Since, X-File-Name, Cache-Control, X-XSRFToken, Authorization")
+	c.Request().Header.Set("Content-Type", "application/json")
+	if c.Request().Method == "OPTIONS" {
+		c.String(204, "")
+	}
+	return nil
 }
 
 func auth(c *echo.Context) error {
