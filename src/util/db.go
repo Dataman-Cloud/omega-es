@@ -37,6 +37,7 @@ func upgradeDB() {
 		config.GetConfig().Mc.Host,
 		config.GetConfig().Mc.Port,
 		config.GetConfig().Mc.DataBase)
+	uri = "mysql://root:1111111@tcp(10.3.37.6:3306)/oapp?parseTime=true&loc=Local"
 	log.Info("upgrade db mysql drive: ", uri)
 	errors, ok := migrate.UpSync(uri, "./sql")
 	if errors != nil && len(errors) > 0 {
