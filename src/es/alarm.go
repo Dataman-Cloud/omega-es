@@ -52,11 +52,20 @@ func CreateLogAlarm(c *echo.Context) error {
 		log.Error("create log alarm param can't get interval")
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "create log alarm param can't get interval"})
 	}
+	if int8(interval) <= 0 {
+		log.Error("create log alarm interval must be greater than 0")
+		return ReturnError(c, map[string]interface{}{"code": 170015, "data": "create log alarm interval must be greater than 0"})
+	}
 
 	gtnum, ok := json.Path("gtnum").Data().(float64)
 	if !ok {
 		log.Error("create log alarm param can't get gtnum")
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "create log alarm param can't get gtnum"})
+	}
+
+	if int8(gtnum) <= 0 {
+		log.Error("create log alarm gtnum must be greater than 0")
+		return ReturnError(c, map[string]interface{}{"code": 170015, "data": "create log alarm gtnum must be greater than 0"})
 	}
 	/*alarmname, ok := json.Path("alarmname").Data().(string)
 	if !ok {
