@@ -343,7 +343,7 @@ func JobExec(c *echo.Context) error {
 				"subject":  fmt.Sprintf("数人云日志告警-策略%d-告警事件%d", alarm.Id, aid),
 				"emails":   strings.Split(alarm.Emails, ","),
 				"data": map[string]string{
-					"content": fmt.Sprintf("%s日志在%d分钟内出现%s%d次，请您关注", alarm.AppName, alarm.Ival, alarm.KeyWord, int64(out.Count)),
+					"content": fmt.Sprintf("应用%s日志在%d分钟内出现关键词%s%d次，请您关注", alarm.AppName, alarm.Ival, alarm.KeyWord, int64(out.Count)),
 				},
 			}
 			bemail, err := enjson.Marshal(memail)
