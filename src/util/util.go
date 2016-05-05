@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/md5"
 	"encoding/base32"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,6 +13,11 @@ import (
 	"io"
 	"net/http"
 	"strings"
+)
+
+const (
+	EmailDefalutUser = "1"
+	InternalTokenKey = "Sry-Svc-Token"
 )
 
 func ReadBody(c *echo.Context) ([]byte, error) {
@@ -98,10 +104,26 @@ func SendEmail(body string) error {
 	if err != nil {
 		return err
 	}
+	token := CronTokenBuilder(EmailDefalutUser)
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(InternalTokenKey, token)
+	req.Header.Set("uid", EmailDefalutUser)
 	client := &http.Client{}
 	_, err = client.Do(req)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+func CronTokenBuilder(uid string) string {
+	b64 := GetBaseEncoding()
+	md5Token := fmt.Sprintf("%x", md5.Sum([]byte(uid)))
+	b64Token := b64.EncodeToString([]byte(uid))
+	token := b64.EncodeToString([]byte(fmt.Sprintf("%s:%s", md5Token, b64Token)))[:20]
+	return strings.ToLower(token)
+}
+
+func GetBaseEncoding() *base64.Encoding {
+	return base64.NewEncoding("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/")
 }
