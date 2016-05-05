@@ -43,14 +43,6 @@ func initEcho() {
 		ea.Get("/scheduler/history", GetAlarmHistory)
 	}
 
-	/*ew := e.Group("/es/watcher")
-	{
-		ew.Post("/create", CreateWatcher)
-		ew.Post("/delete", DeleteWatcher)
-		ew.Get("/list/:usertype/:userid", GetWatchers)
-		ew.Post("/history", GetWatcherHistory)
-	}*/
-
 	ed := e.Group("/es/download")
 	{
 		ed.Get("/index/log", ExportIndex)
