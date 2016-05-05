@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Host string
 	Port uint16
+	Murl string
 	Lc   LogConfig       `mapstructure:"log"`
 	Ec   EsConfig        `mapstructure:"es"`
 	Rc   RedisConfig     `mapstructure:"redis"`

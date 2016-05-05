@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Dataman-Cloud/omega-es/src/config"
 	"github.com/labstack/echo"
 	"io"
 	"net/http"
@@ -90,4 +91,17 @@ func SchdulerAuth(usertype, alarmname string, uid int64) string {
 	anc := fmt.Sprintf("%x", md5.Sum([]byte(anb+"-+-+")))
 	return anc
 
+}
+
+func SendEmail(body string) error {
+	req, err := http.NewRequest("POST", config.GetConfig().Murl, strings.NewReader(body))
+	if err != nil {
+		return err
+	}
+	client := &http.Client{}
+	_, err = client.Do(req)
+	if err != nil {
+		return err
+	}
+	return nil
 }

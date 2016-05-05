@@ -12,6 +12,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/sluu99/uuid"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -333,9 +334,25 @@ func JobExec(c *echo.Context) error {
 	}
 	if int64(out.Count) >= alarm.GtNum {
 		alarmHistory.IsAlarm = true
-		if _, err = dao.AddAlaramHistory(alarmHistory); err != nil {
+		if aid, err := dao.AddAlaramHistory(alarmHistory); err != nil {
 			log.Errorf("exec chronos job insert into alarm history error: %v", err)
 			return ReturnError(c, map[string]interface{}{"code": 17012, "data": "exec chronos job insert into alarm history error: " + err.Error()})
+		} else {
+			memail := map[string]interface{}{
+				"template": "alarm",
+				"subject":  fmt.Sprintf("数人云日志告警-策略%d-告警事件%d", alarm.Id, aid),
+				"emails":   strings.Split(alarm.Emails, ","),
+				"data": map[string]string{
+					"content": fmt.Sprintf("%s日志在%d分钟内出现%s%d次，请您关注", alarm.AppName, alarm.Ival, alarm.KeyWord, int64(out.Count)),
+				},
+			}
+			bemail, err := enjson.Marshal(memail)
+			if err == nil {
+				err = SendEmail(string(bemail))
+				if err != nil {
+					log.Errorf("alarm send email error: %v", err)
+				}
+			}
 		}
 	} else {
 		alarmHistory.IsAlarm = false
