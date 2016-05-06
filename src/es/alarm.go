@@ -317,6 +317,7 @@ func JobExec(c *echo.Context) error {
 		`","analyzer":"ik"}}},{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) + `","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}`
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + time.Now().String()[:10]
 	gid, err := GetUserType(int64(userid), int64(clusterid))
+	log.Debug("------:", gid, err)
 	if err == nil {
 		esindex = "logstash-*" + gid + "-" + time.Now().String()[:10]
 	}
