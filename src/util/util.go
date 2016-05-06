@@ -119,11 +119,11 @@ func SendEmail(body string) error {
 	return nil
 }
 
-func GetUserType(uid, clusterid int64) error {
+func GetUserType(uid, clusterid int64) (string, error) {
 	req, err := http.NewRequest("GET", fmt.Sprintf("http://devforward.dataman-inc.net/api/v3/clusters/%d", clusterid), nil)
 	log.Debugf("get usertype uri: %s", fmt.Sprintf("http://devforward.dataman-inc.net/api/v3/clusters/%d", clusterid))
 	if err != nil {
-		return err
+		return "", err
 	}
 	token := CronTokenBuilder(fmt.Sprintf("%d", uid))
 	req.Header.Set("Content-Type", "application/json")
@@ -132,21 +132,22 @@ func GetUserType(uid, clusterid int64) error {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return err
+		return "", err
 	}
 	respbody, err := ReadResponseBody(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		log.Errorf("get user tyep read reponse body error: %v", err)
-		return err
+		return "", err
 	}
 	jsonp, err := gabs.ParseJSON(respbody)
 	if err != nil {
-		return err
+		return "", err
 	}
-
-	log.Debug("----------:", uid, "---", jsonp.Path("data.group_id").Data())
-	return nil
+	if jsonp.Path("data.group_id").Data() == nil {
+		return "", errors.New("oweruser id")
+	}
+	return jsonp.Path("data.group_id").Data().(string), nil
 }
 
 func CronTokenBuilder(uid string) string {
