@@ -7,15 +7,16 @@ import (
 )
 
 type Config struct {
-	Host string
-	Port uint16
-	Murl string
-	Lc   LogConfig       `mapstructure:"log"`
-	Ec   EsConfig        `mapstructure:"es"`
-	Rc   RedisConfig     `mapstructure:"redis"`
-	Mc   MysqlConfig     `mapstructure:"mysql"`
-	Ch   ChronosConfig   `mapstructure:"chronos"`
-	Sh   SchedulerConfig `mapstructure:"scheduler"`
+	Host    string
+	Port    uint16
+	Murl    string
+	Userurl string
+	Lc      LogConfig       `mapstructure:"log"`
+	Ec      EsConfig        `mapstructure:"es"`
+	Rc      RedisConfig     `mapstructure:"redis"`
+	Mc      MysqlConfig     `mapstructure:"mysql"`
+	Ch      ChronosConfig   `mapstructure:"chronos"`
+	Sh      SchedulerConfig `mapstructure:"scheduler"`
 }
 
 type LogConfig struct {
