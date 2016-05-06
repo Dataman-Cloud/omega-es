@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"github.com/Dataman-Cloud/omega-es/src/config"
 	log "github.com/cihub/seelog"
+	"github.com/jeffail/gabs"
 	"github.com/labstack/echo"
 	"io"
 	"net/http"
@@ -139,7 +140,12 @@ func GetUserType(uid, clusterid int64) error {
 		log.Errorf("get user tyep read reponse body error: %v", err)
 		return err
 	}
-	log.Debug("----------:", string(respbody))
+	jsonp, err := gabs.ParseJSON(respbody)
+	if err != nil {
+		return err
+	}
+
+	log.Debug("----------:", uid, "---", jsonp.Path("data.group_id").Data())
 	return nil
 }
 
