@@ -66,6 +66,7 @@ func updatedata() {
 	for _, history := range historys {
 		hsql := `update alarmhistory set uid=:uid,cid=:cid,appname=:appname,keyword=:keyword,ival=:ival,gtnum=:gtnum where id=:id`
 		_, err := db.NamedExec(hsql, history)
+
 		log.Debug("++++++++++:", err)
 	}
 	log.Debug("update end...")
