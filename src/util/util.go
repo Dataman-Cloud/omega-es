@@ -147,8 +147,7 @@ func GetUserType(uid, clusterid int64) (string, error) {
 	if jsonp.Path("data.group_id").Data() == nil {
 		return "", errors.New("oweruser id")
 	}
-	log.Debug("-----------+++", jsonp.Path("data.group_id").Data().(float64))
-	return fmt.Sprintf("%d", jsonp.Path("data.group_id").Data().(float64)), nil
+	return fmt.Sprintf("%d", int64(jsonp.Path("data.group_id").Data().(float64))), nil
 }
 
 func CronTokenBuilder(uid string) string {
