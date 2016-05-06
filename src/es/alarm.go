@@ -321,6 +321,7 @@ func JobExec(c *echo.Context) error {
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + time.Now().String()[:10]
 	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	out, err := Conn.Count(esindex, estype, nil, query)
+	log.Debug("+++++++++++", out.Count)
 	if err != nil {
 		log.Errorf("exec chronos job search es count error: %v", err)
 		return ReturnError(c, map[string]interface{}{"code": 17010, "data": "exec chronos job search es count error: " + err.Error()})
