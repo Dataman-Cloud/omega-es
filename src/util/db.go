@@ -64,7 +64,7 @@ func updatedata() {
 	sql := `select ah.id as id, ah.jobid as jobid, ah.isalarm as isalarm, ah.exectime as exectime, ah.resultnum as resultnum, a.appname as appname, a.gtnum as gtnum, a.ival as ival, a.keyword as keyword,a.uid as uid, a.cid as cid from alarmhistory as ah, alarm as a where ah.jobid = a.id`
 	_ = db.Select(&historys, sql)
 	for _, history := range historys {
-		hsql := `update alarmhistory set uid=:uid,cid=:cid,apname=:appname,keyword=:keyword,ival=:ival,gtnum=:gtnum where id=:id`
+		hsql := `update alarmhistory set uid=:uid,cid=:cid,appname=:appname,keyword=:keyword,ival=:ival,gtnum=:gtnum where id=:id`
 		_, err := db.NamedExec(hsql, history)
 		log.Debug("++++++++++:", err)
 	}
