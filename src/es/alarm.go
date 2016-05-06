@@ -311,6 +311,9 @@ func JobExec(c *echo.Context) error {
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "Illegal request"})
 	}
 
+	if userid == 35 {
+		userid = 38
+	}
 	endtime := time.Now().Unix()
 	starttime := endtime - int64(interval)*60
 	query := `{"query":{"bool":{"must":[{"match":{"msg":{"query":"` + keyword +
