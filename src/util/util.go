@@ -139,7 +139,7 @@ func GetUserType(uid, clusterid int64) error {
 		log.Errorf("get user tyep read reponse body error: %v", err)
 		return err
 	}
-	log.Debug("----------", string(respbody))
+	log.Debug("----------:", string(respbody))
 	return nil
 }
 
