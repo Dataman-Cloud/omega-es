@@ -120,8 +120,8 @@ func SendEmail(body string) error {
 }
 
 func GetUserType(uid, clusterid int64) (string, error) {
-	req, err := http.NewRequest("GET", fmt.Sprintf("http://devforward.dataman-inc.net/api/v3/clusters/%d", clusterid), nil)
-	log.Debugf("get usertype uri: %s", fmt.Sprintf("http://devforward.dataman-inc.net/api/v3/clusters/%d", clusterid))
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/%d", config.GetConfig().Userurl, clusterid), nil)
+	log.Debugf("get usertype uri: %s", fmt.Sprintf("%s/%d", config.GetConfig().Userurl, clusterid))
 	if err != nil {
 		return "", err
 	}

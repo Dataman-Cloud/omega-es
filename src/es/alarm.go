@@ -320,7 +320,6 @@ func JobExec(c *echo.Context) error {
 	if err == nil {
 		esindex = "logstash-*" + gid + "-" + time.Now().String()[:10]
 	}
-	log.Debugf("----------:%d  %s", int64(userid), esindex)
 	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	out, err := Conn.Count(esindex, estype, nil, query)
 	if err != nil {
