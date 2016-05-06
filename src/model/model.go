@@ -46,4 +46,6 @@ type AlarmHistory struct {
 	GtNum     int64     `json:"gtnum"`
 	AppName   string    `json:"appname"`
 	KeyWord   string    `json:"keyword"`
+	Uid       int64     `json:"uid"`
+	Cid       int64     `json:"cid"`
 }

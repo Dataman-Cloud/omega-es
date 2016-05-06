@@ -335,6 +335,12 @@ func JobExec(c *echo.Context) error {
 		JobId:     alarm.Id,
 		ExecTime:  time.Now(),
 		ResultNum: int64(out.Count),
+		Uid:       int64(userid),
+		Cid:       int64(clusterid),
+		KeyWord:   keyword,
+		AppName:   alarm.AppName,
+		GtNum:     alarm.GtNum,
+		Ival:      alarm.Ival,
 	}
 	if int64(out.Count) >= alarm.GtNum {
 		alarmHistory.IsAlarm = true
