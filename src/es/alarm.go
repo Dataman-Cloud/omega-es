@@ -316,9 +316,8 @@ func JobExec(c *echo.Context) error {
 	query := `{"query":{"bool":{"must":[{"match":{"msg":{"query":"` + keyword +
 		`","analyzer":"ik"}}},{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) + `","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}`
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + time.Now().String()[:10]
-	if userid == 35 {
-		esindex = "logstash-*38-" + time.Now().String()[:10]
-	}
+	err = GetUserType(int64(userid), int64(clusterid))
+	log.Debug("+++++++++", err)
 	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	out, err := Conn.Count(esindex, estype, nil, query)
 	if err != nil {
@@ -326,7 +325,6 @@ func JobExec(c *echo.Context) error {
 		return ReturnError(c, map[string]interface{}{"code": 17010, "data": "exec chronos job search es count error: " + err.Error()})
 	}
 	alarm, err := dao.GetAlarmByName(usertype, alarmname, int64(userid))
-	log.Debug("------------", err, alarm.Id, out.Count, alarm.GtNum, esindex, estype, query)
 	if err != nil {
 		log.Errorf("exec chronos job can't get alarm by alarmname error: %v", err)
 		return ReturnError(c, map[string]interface{}{"code": 17011, "data": "exec chronos job can't get alarm by alarmname error: " + err.Error()})

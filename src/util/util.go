@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Dataman-Cloud/omega-es/src/config"
+	log "github.com/cihub/seelog"
 	"github.com/labstack/echo"
 	"io"
 	"net/http"
@@ -116,6 +117,32 @@ func SendEmail(body string) error {
 	}
 	return nil
 }
+
+func GetUserType(uid, clusterid int64) error {
+	req, err := http.NewRequest("GET", fmt.Sprintf("http://devforward.dataman-inc.net/api/v3/clusters/%d", clusterid), nil)
+	log.Debugf("get usertype uri: %s", fmt.Sprintf("http://devforward.dataman-inc.net/api/v3/clusters/%d", clusterid))
+	if err != nil {
+		return err
+	}
+	token := CronTokenBuilder(fmt.Sprintf("%d", uid))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(InternalTokenKey, token)
+	req.Header.Set("uid", fmt.Sprintf("%d", uid))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	respbody, err := ReadResponseBody(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		log.Errorf("get user tyep read reponse body error: %v", err)
+		return err
+	}
+	log.Debug("----------", string(respbody))
+	return nil
+}
+
 func CronTokenBuilder(uid string) string {
 	b64 := GetBaseEncoding()
 	md5Token := fmt.Sprintf("%x", md5.Sum([]byte(uid)))
