@@ -323,7 +323,7 @@ func JobExec(c *echo.Context) error {
 		return ReturnError(c, map[string]interface{}{"code": 17010, "data": "exec chronos job search es count error: " + err.Error()})
 	}
 	alarm, err := dao.GetAlarmByName(usertype, alarmname, int64(userid))
-	log.Debug("------------", err, alarm.Id)
+	log.Debug("------------", err, alarm.Id, out.Count, alarm.GtNum, esindex, estype, query)
 	if err != nil {
 		log.Errorf("exec chronos job can't get alarm by alarmname error: %v", err)
 		return ReturnError(c, map[string]interface{}{"code": 17011, "data": "exec chronos job can't get alarm by alarmname error: " + err.Error()})
