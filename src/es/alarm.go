@@ -316,8 +316,11 @@ func JobExec(c *echo.Context) error {
 	query := `{"query":{"bool":{"must":[{"match":{"msg":{"query":"` + keyword +
 		`","analyzer":"ik"}}},{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) + `","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}`
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + time.Now().String()[:10]
-	err = GetUserType(int64(userid), int64(clusterid))
-	log.Debug("+++++++++", err)
+	gid, err := GetUserType(int64(userid), int64(clusterid))
+	if err == nil {
+		esindex = "logstash-*" + gid + "-" + time.Now().String()[:10]
+	}
+	log.Debugf("----------:%d  %s", int64(userid), esindex)
 	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	out, err := Conn.Count(esindex, estype, nil, query)
 	if err != nil {
