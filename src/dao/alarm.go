@@ -61,7 +61,7 @@ func GetAlarmsByUser(utype string, uid, pcount, pnum int64, sortby, order, keywo
 		sortby = "createtime"
 	}
 	if order == "" {
-		order = "asc"
+		order = "desc"
 	}
 
 	alarms := []model.LogAlarm{}
@@ -100,12 +100,12 @@ func DeleteAlarmByJobId(jobid int64) error {
 		tx.Rollback()
 		return err
 	}
-	_, err = tx.Exec("delete from alarmhistory where jobid = ?", jobid)
+	/*_, err = tx.Exec("delete from alarmhistory where jobid = ?", jobid)
 	if err != nil {
 		log.Errorf("delete alarmhistor error: %v", err)
 		tx.Rollback()
 		return err
-	}
+	}*/
 	err = tx.Commit()
 	if err != nil {
 		log.Errorf("delete alarm commit error: %v", err)
@@ -164,7 +164,7 @@ func GetHistoryByJobId(uid, pcount, pnum int64, sortby, order, keyword string) (
 	if pnum <= 0 {
 		pnum = 1
 	}
-	if sortby == "" || sortby == "exectime" {
+	/*if sortby == "" || sortby == "exectime" {
 		sortby = "ah.exectime"
 	} else if sortby == "keyword" {
 		sortby = "a.keyword"
@@ -176,15 +176,23 @@ func GetHistoryByJobId(uid, pcount, pnum int64, sortby, order, keyword string) (
 		sortby = "a.appname"
 	} else if sortby == "id" {
 		sortby = "ah.id"
+	}*/
+	if sortby == "" {
+		sortby = "exectime"
 	}
 	if order == "" {
-		order = "asc"
+		order = "desc"
 	}
 	db := util.DB()
 	historys := []model.AlarmHistory{}
-	sql := `select ah.id as id, ah.jobid as jobid, ah.isalarm as isalarm, ah.exectime as exectime, ah.resultnum as resultnum, a.appname as appname, a.gtnum as gtnum, a.ival as ival, a.keyword as keyword from alarmhistory as ah, alarm as a where ah.jobid = a.id and ah.isalarm = true and a.uid = ?`
+	/*sql := `select ah.id as id, ah.jobid as jobid, ah.isalarm as isalarm, ah.exectime as exectime, ah.resultnum as resultnum, a.appname as appname, a.gtnum as gtnum, a.ival as ival, a.keyword as keyword from alarmhistory as ah, alarm as a where ah.jobid = a.id and ah.isalarm = true and a.uid = ?`
 	if keyword != "" {
 		sql = sql + ` and a.appname like '%` + keyword + `%'`
+	}
+	sql = sql + ` order by ` + sortby + ` ` + order + ` limit ?,?`*/
+	sql := `select * from alarmhistory where uid = ?`
+	if keyword != "" {
+		sql = sql + ` and appname like '%` + keyword + `%'`
 	}
 	sql = sql + ` order by ` + sortby + ` ` + order + ` limit ?,?`
 	err := db.Select(&historys, sql, uid, (pnum-1)*pcount, pcount)
