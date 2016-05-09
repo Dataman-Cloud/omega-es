@@ -38,6 +38,7 @@ func initEcho() {
 	ea := e.Group("/es/alarm", auth)
 	{
 		ea.Post("/create", CreateLogAlarm)
+		ea.Post("/update", UpdateLogAlarm)
 		ea.Delete("/delete/:id", DeleteAlarm)
 		ea.Get("/list", GetAlarms)
 		ea.Get("/scheduler/history", GetAlarmHistory)

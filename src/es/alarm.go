@@ -402,3 +402,135 @@ func GetAlarmHistory(c *echo.Context) error {
 		"count":  count,
 	}})
 }
+
+func UpdateLogAlarm(c *echo.Context) error {
+	body, err := ReadBody(c)
+	if err != nil {
+		log.Error("update log alarm can't get request body error: ", err)
+		return ReturnError(c, map[string]interface{}{"code": 17001, "data": "update log alarm can't get request body"})
+	}
+	json, err := gabs.ParseJSON(body)
+	if err != nil {
+		log.Error("update log alarm request parse to json error: ", err)
+		return ReturnError(c, map[string]interface{}{"code": 17002, "data": "update log alarm request parse to json error"})
+	}
+
+	id, ok := json.Path("id").Data().(float64)
+	if !ok {
+		log.Error("update log alarm param can't get id")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get id"})
+	}
+
+	clusterid, ok := json.Path("clusterid").Data().(float64)
+	if !ok {
+		log.Error("update log alarm param can't get clusterid")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get clusterid"})
+	}
+
+	appalias, ok := json.Path("appalias").Data().(string)
+	if !ok {
+		log.Error("update log alarm param can't get appalias")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get appalias"})
+	}
+	appname, ok := json.Path("appname").Data().(string)
+	if !ok {
+		log.Error("update log alarm param can't get appname")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get appname"})
+	}
+	interval, ok := json.Path("interval").Data().(float64)
+	if !ok {
+		log.Error("update log alarm param can't get interval")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get interval"})
+	}
+	if int8(interval) <= 0 {
+		log.Error("update log alarm interval must be greater than 0")
+		return ReturnError(c, map[string]interface{}{"code": 170015, "data": "update log alarm interval must be greater than 0"})
+	}
+
+	gtnum, ok := json.Path("gtnum").Data().(float64)
+	if !ok {
+		log.Error("update log alarm param can't get gtnum")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get gtnum"})
+	}
+
+	if int8(gtnum) <= 0 {
+		log.Error("update log alarm gtnum must be greater than 0")
+		return ReturnError(c, map[string]interface{}{"code": 170015, "data": "update log alarm gtnum must be greater than 0"})
+	}
+
+	usertype, ok := json.Path("usertype").Data().(string)
+	if !ok {
+		log.Error("update log alarm param can't get usertype")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get usertype"})
+	}
+	keyword, ok := json.Path("keyword").Data().(string)
+	if !ok {
+		log.Error("update log alarm param can't get keyword")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get keyword"})
+	}
+	emails, ok := json.Path("emails").Data().(string)
+	if !ok {
+		log.Error("update log alarm param can'get get emails")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get emails"})
+	}
+	alarm, err := dao.GetAlarmById(int64(id))
+	if err != nil {
+		log.Errorf("get alarm error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "get alarm error: " + err.Error()})
+	}
+	alarm.Cid = int64(clusterid)
+	alarm.AppAlias = appalias
+	alarm.AppName = appname
+	alarm.Ival = int8(interval)
+	alarm.GtNum = int64(gtnum)
+	alarm.UserType = usertype
+	alarm.KeyWord = keyword
+	alarm.Emails = emails
+	/*alarm = &model.LogAlarm{
+		Cid:      int64(clusterid),
+		AppAlias: appalias,
+		AppName:  appname,
+		Ival:     int8(interval),
+		GtNum:    int64(gtnum),
+		UserType: usertype,
+		KeyWord:  keyword,
+		Emails:   emails,
+	}*/
+	err = dao.UpdateAlarm(&alarm)
+	if err != nil {
+		log.Errorf("update alarm db table error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17015, "data": "updata alarm db table error"})
+	}
+	asearch := map[string]interface{}{
+		"userid":    alarm.Uid,
+		"clusterid": alarm.Cid,
+		"keyword":   alarm.KeyWord,
+		"appname":   alarm.AppName,
+		"interval":  alarm.Ival,
+		"usertype":  alarm.UserType,
+		"alarmname": alarm.AlarmName,
+	}
+	abody, err := enjson.Marshal(asearch)
+	if err != nil {
+		log.Errorf("update log alarm asearch parse to json string error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17007, "data": "update log alarm asearch parse to json string error: " + err.Error()})
+	}
+
+	authtoken := SchdulerAuth(alarm.UserType, alarm.AlarmName, alarm.Uid)
+	scheduleCommand := fmt.Sprintf("curl -XPOST -H 'Content-Type: application/json' -H 'Authorization: %s' http://%s:%d/api/v3/scheduler -d '%s'", authtoken, config.GetConfig().Sh.Host, config.GetConfig().Sh.Port, string(abody))
+
+	jobBody := map[string]interface{}{
+		"name":     alarm.AliasName,
+		"command":  scheduleCommand,
+		"schedule": "R/" + time.Now().Format(time.RFC3339) + "/PT" + fmt.Sprintf("%d", int8(interval)) + "M",
+		"owner":    "yqguo@dataman-inc.com",
+		"async":    false,
+	}
+	cbody, _ := enjson.Marshal(jobBody)
+	if err = UpdateJob(string(cbody)); err != nil {
+		log.Errorf("update log alarm add a chronos job error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17008, "data": "update log alarm add a chronos job error: " + err.Error()})
+	}
+
+	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "update log alarm successful"})
+}

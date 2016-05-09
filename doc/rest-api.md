@@ -84,6 +84,23 @@ curl -X POST http://10.3.20.53:5009/es/alarm/create \
 }'
 ```
 
+####PUT `/es/alarm/update`
+创建报警策略
+```shell
+curl -X PUT http://10.3.20.53:5009/es/alarm/update \
+	-H Authorization:usertoken \
+	-H Content-Type:application/json -d '{
+    "id":1,
+    "clusterid": 1,
+    "appname": "testalarm",
+    "appalias": "test",
+    "interval": 5,
+    "gtnum": 10,
+    "usertype": "user",
+    "keyword": "error",
+    "emails": "yqguo@dataman-inc.com"
+}'
+```
 ####DELETE `/es/alarm/delete/:id`
 删除报警策略
 `curl -X -H Authorization:usertoken DELETE http://10.3.20.53:5009/es/alarm/delete/:id`

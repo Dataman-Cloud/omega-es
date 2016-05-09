@@ -198,3 +198,10 @@ func GetHistoryByJobId(uid, pcount, pnum int64, sortby, order, keyword string) (
 	err := db.Select(&historys, sql, uid, (pnum-1)*pcount, pcount)
 	return historys, err
 }
+
+func UpdateAlarm(alarm *model.LogAlarm) error {
+	db := util.DB()
+	sql := `update alarm set cid=:cid, appalias=:appalias, appname:=appname, ival=:ival, gtnum=:gtnum, usertype=:usertype, keyword=:keyword, emails=:emails where id=:id`
+	_, err := db.NamedExec(sql, alarm)
+	return err
+}
