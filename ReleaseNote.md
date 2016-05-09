@@ -2,7 +2,7 @@
 
 更新版本v0.1.050900
 ##需要运维更新
-*修改nginx配置文件
+ * 修改nginx配置文件
 ```
 在原有的nginx配置文件基础上增减update stop restart 等
 location ~ /es/alarm/(create|list|delete|update|stop|restart|scheduler/history|\d) {
