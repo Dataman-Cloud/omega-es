@@ -85,7 +85,7 @@ curl -X POST http://10.3.20.53:5009/es/alarm/create \
 ```
 
 ####PUT `/es/alarm/update`
-创建报警策略
+更新报警策略
 ```shell
 curl -X PUT http://10.3.20.53:5009/es/alarm/update \
 	-H Authorization:usertoken \
@@ -101,6 +101,14 @@ curl -X PUT http://10.3.20.53:5009/es/alarm/update \
     "emails": "yqguo@dataman-inc.com"
 }'
 ```
+####GET `/es/alarm/:id`
+获取策略详细信息
+`curl -X -H Authorization:usertoken GET http://10.3.20.53:5009/es/alarm/:id`
+
+####PUT `/es/alarm/stop/:id`
+停止策略
+`curl -X -H Authorization:usertoken PUT http://10.3.20.53:5009/es/alarm/stop/:id`
+
 ####DELETE `/es/alarm/delete/:id`
 删除报警策略
 `curl -X -H Authorization:usertoken DELETE http://10.3.20.53:5009/es/alarm/delete/:id`

@@ -205,3 +205,10 @@ func UpdateAlarm(alarm *model.LogAlarm) error {
 	_, err := db.NamedExec(sql, alarm)
 	return err
 }
+
+func UpdateAlarmStatus(alarm *model.LogAlarm) error {
+	db := util.DB()
+	sql := `update alarm set isnotice = :isnotice where id=:id`
+	_, err := db.NamedExec(sql, alarm)
+	return err
+}

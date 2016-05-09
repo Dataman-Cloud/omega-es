@@ -189,43 +189,22 @@ func GetAlarms(c *echo.Context) error {
 	return ReturnError(c, map[string]interface{}{"code": 17009, "data": "get alarms error: " + err.Error()})
 }
 
-func GetAlarm(c *echo.Context) error {
-	body, err := ReadBody(c)
+func GetLogAlarm(c *echo.Context) error {
+	id := c.Param("id")
+	jobid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
-		log.Error("get alarm can't get request body error: ", err)
-		return ReturnError(c, map[string]interface{}{"code": 17001, "data": "get alarm can't get request body"})
+		log.Errorf("get alarm parse id to int64 error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "get alarm parse id to int64 error"})
 	}
-	json, err := gabs.ParseJSON(body)
+	alarm, err := dao.GetAlarmById(jobid)
 	if err != nil {
-		log.Error("get alarm request parse to json error: ", err)
-		return ReturnError(c, map[string]interface{}{"code": 17002, "data": "get alarm request parse to json error"})
+		log.Errorf("get alarm by id error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "get alarm by id error"})
 	}
-	userid, ok := json.Path("userid").Data().(float64)
-	if !ok {
-		log.Error("get alarm param can't get userid")
-		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "get alarm param can't get userid"})
-	}
-
-	usertype, ok := json.Path("usertype").Data().(string)
-	if !ok {
-		log.Error("get alarm param can't get usertype")
-		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "get alarm param can't get usertype"})
-	}
-
-	alarmname, ok := json.Path("alarmname").Data().(string)
-	if !ok {
-		log.Error("get alarm param can't get alarmname")
-		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "get alarm param can't get alarname"})
-	}
-	alarm, err := dao.GetAlarmByName(usertype, alarmname, int64(userid))
-	if err != nil {
-		log.Errorf("get alarm select from table error: %v", err)
-		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "get alarm select from table error: " + err.Error()})
-	}
-	return ReturnOK(c, map[string]interface{}{"code": 0, "data": alarm})
+	return ReturnOK(c, map[string]interface{}{"code": 0, "data": map[string]interface{}{"alarm": alarm, "count": 1}})
 }
 
-func DeleteAlarm(c *echo.Context) error {
+func DeleteLogAlarm(c *echo.Context) error {
 	id := c.Param("id")
 	jobid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -533,4 +512,39 @@ func UpdateLogAlarm(c *echo.Context) error {
 	}
 
 	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "update log alarm successful"})
+}
+
+func StopLogAlarm(c *echo.Context) error {
+	id := c.Param("id")
+	jobid, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		log.Errorf("stop log alarm parse id to int64 error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "stop log alarm parse id to int64 error"})
+	}
+	/*uid := c.Get("uid").(string)
+	userid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		log.Errorf("stop log alarm parse uid to int64 error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "stop log alarm parse uid to int64 error"})
+	}*/
+	alarm, err := dao.GetAlarmById(jobid)
+	if err != nil {
+		log.Errorf("stop log alarm get alarm by id error: %v", id)
+		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop log alarm get alarm by id error"})
+	}
+	if !alarm.Isnotice {
+		return ReturnOK(c, map[string]interface{}{"code": 0, "data": "alarm is already stop"})
+	}
+	alarm.Isnotice = false
+	err = dao.UpdateAlarmStatus(&alarm)
+	if err != nil {
+		log.Errorf("stop log alarm update alarm status error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop log alarm update alarm status error"})
+	}
+	err = DeleteJob(alarm.AliasName)
+	if err != nil {
+		log.Errorf("stop log alarm stop schduler job error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "stop log alarm stop schduler job error"})
+	}
+	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "stop alarm successful"})
 }

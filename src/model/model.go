@@ -34,6 +34,7 @@ type LogAlarm struct {
 	Emails     string    `json:"emails"`
 	AliasName  string    `json:"aliasname"`
 	CreateTime time.Time `json:"createtime"`
+	Isnotice   bool      `json:"isnotice"`
 }
 
 type AlarmHistory struct {
