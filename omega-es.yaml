@@ -13,7 +13,7 @@ es:
     hosts: "10.3.20.54"
     port: 9200
 redis:
-    host: "10.3.37.16"
+    host: "10.3.20.53"
     port: 6379
 mysql:
     host: "10.3.20.53" 
@@ -28,4 +28,4 @@ chronos:
     port: 5097
 scheduler:
     host: "10.3.20.53"
-    port: 5009
+    port: 5010

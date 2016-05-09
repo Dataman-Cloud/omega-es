@@ -548,3 +548,53 @@ func StopLogAlarm(c *echo.Context) error {
 	}
 	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "stop alarm successful"})
 }
+
+func RestartLogAlarm(c *echo.Context) error {
+	id := c.Param("id")
+	jobid, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		log.Errorf("restart log alarm parse id to int64 error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "restart log alarm parse id to int64 error"})
+	}
+	alarm, err := dao.GetAlarmById(jobid)
+	if err != nil {
+		log.Errorf("restart log alarm can't get alarm by jobid")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "restart log alarm can't get alarm by jobid error: " + err.Error()})
+	}
+	alarm.Isnotice = true
+	err = dao.UpdateAlarmStatus(&alarm)
+	if err != nil {
+		log.Errorf("restart log alarm update alarm status error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "restart log alarm update alarm status error"})
+	}
+	asearch := map[string]interface{}{
+		"userid":    alarm.Uid,
+		"clusterid": alarm.Cid,
+		"keyword":   alarm.KeyWord,
+		"appname":   alarm.AppAlias,
+		"interval":  alarm.Ival,
+		"usertype":  alarm.UserType,
+		"alarmname": alarm.AlarmName,
+	}
+	abody, err := enjson.Marshal(asearch)
+	if err != nil {
+		log.Errorf("restart log alarm asearch parse to json string error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17007, "data": "restart log alarm asearch parse to json string error: " + err.Error()})
+	}
+	authtoken := SchdulerAuth(alarm.UserType, alarm.AlarmName, alarm.Uid)
+	scheduleCommand := fmt.Sprintf("curl -XPOST -H 'Content-Type: application/json' -H 'Authorization: %s' http://%s:%d/api/v3/scheduler -d '%s'", authtoken, config.GetConfig().Sh.Host, config.GetConfig().Sh.Port, string(abody))
+	jobBody := map[string]interface{}{
+		"name":     alarm.AliasName,
+		"command":  scheduleCommand,
+		"schedule": "R/" + time.Now().Format(time.RFC3339) + "/PT" + fmt.Sprintf("%d", alarm.Ival) + "M",
+		"owner":    "yqguo@dataman-inc.com",
+		"async":    false,
+	}
+	cbody, _ := enjson.Marshal(jobBody)
+	if err = CreateJob(string(cbody)); err != nil {
+		log.Errorf("restart log alarm add a chronos job error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17008, "data": "restart log alarm add a chronos job error: " + err.Error()})
+	}
+
+	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "restart log alarm successful"})
+}

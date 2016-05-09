@@ -19,12 +19,18 @@ func init() {
 var db *sqlx.DB
 
 func DB() *sqlx.DB {
+	var err error
 	if db != nil {
 		return db
 	}
 	mutex := sync.Mutex{}
 	mutex.Lock()
-	db, _ = InitDB()
+	db, err = InitDB()
+	if err != nil {
+		log.Errorf("init db error: %v", err)
+		log.Flush()
+		panic(-1)
+	}
 	defer mutex.Unlock()
 	return db
 }
@@ -45,12 +51,12 @@ func upgradeDB() {
 		}
 		log.Error("can't upgrade db", errors)
 		log.Flush()
-		//panic(-1)
+		panic(-1)
 	}
 	if !ok {
 		log.Error("can't upgrade db")
 		log.Flush()
-		//panic(-1)
+		panic(-1)
 	}
 	log.Info("DB upgraded")
 	log.Flush()
@@ -67,7 +73,6 @@ func InitDB() (*sqlx.DB, error) {
 	if err != nil {
 		log.Errorf("cat not connection mysql error: %v, uri:%s", err, uri)
 		return db, err
-		//panic(-1)
 	}
 	err = db.Ping()
 	if err != nil {

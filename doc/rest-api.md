@@ -109,6 +109,10 @@ curl -X PUT http://10.3.20.53:5009/es/alarm/update \
 停止策略
 `curl -X -H Authorization:usertoken PUT http://10.3.20.53:5009/es/alarm/stop/:id`
 
+####PUT `/es/alarm/restart/:id`
+重启策略
+`curl -X -H Authorization:usertoken PUT http://10.3.20.53:5009/es/alarm/restart/:id`
+
 ####DELETE `/es/alarm/delete/:id`
 删除报警策略
 `curl -X -H Authorization:usertoken DELETE http://10.3.20.53:5009/es/alarm/delete/:id`

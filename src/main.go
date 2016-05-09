@@ -41,6 +41,7 @@ func initEcho() {
 		ea.Put("/update", UpdateLogAlarm)
 		ea.Delete("/delete/:id", DeleteLogAlarm)
 		ea.Put("/stop/:id", StopLogAlarm)
+		ea.Put("/restart/:id", RestartLogAlarm)
 		ea.Get("/:id", GetLogAlarm)
 		ea.Get("/list", GetAlarms)
 		ea.Get("/scheduler/history", GetAlarmHistory)
