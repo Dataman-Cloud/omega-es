@@ -63,6 +63,7 @@ var pairs Config
 func init() {
 	viper.SetConfigName("omega-es")
 	viper.AddConfigPath("./")
+	viper.AddConfigPath("/etc/omega/")
 	viper.AddConfigPath("$HOME/.omega/")
 	viper.AddConfigPath("/")
 	if err := viper.ReadInConfig(); err != nil {

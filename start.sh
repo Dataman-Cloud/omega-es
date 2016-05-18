@@ -1,2 +1,2 @@
 #!/bin/sh
-/bin/omega-es
+cd /bin/ && ./omega-es
