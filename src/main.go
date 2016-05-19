@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/Dataman-Cloud/omega-es/src/config"
+	_ "github.com/Dataman-Cloud/omega-es/src/cron"
 	. "github.com/Dataman-Cloud/omega-es/src/es"
 	_ "github.com/Dataman-Cloud/omega-es/src/logger"
 	"github.com/Dataman-Cloud/omega-es/src/util"
@@ -56,7 +57,7 @@ func initEcho() {
 	api := e.Group("/api/v3")
 	{
 		api.Get("/health/log", Health)
-		api.Post("/scheduler", JobExec)
+		//api.Post("/scheduler", JobExec)
 	}
 
 	log.Info("listening server address: ", addr)

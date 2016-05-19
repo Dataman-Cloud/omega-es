@@ -1,4 +1,4 @@
-use datamanalarm;
+use alarm;
 
 alter table alarmhistory add uid bigint(20) NOT NULL;
 alter table alarmhistory add cid bigint(20) NOT NULL;
