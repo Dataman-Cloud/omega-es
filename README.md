@@ -22,12 +22,14 @@ go build
   ```
   vim omega-es.yaml.sample  把该配置的都配置上 
   ```
-  如果你上面配置中没有`127.0.0.1`的地址 那么用如下方式启动:
   ```
+  如果你上面配置中没有`127.0.0.1`的地址 那么用如下方式启动:
+
   docker run -d omage-es:latest
   ``` 
-  如果你上面配置中有`127.0.0.1`的地址 那么需要以host模式启动: 
   ```
+  如果你上面配置中有`127.0.0.1`的地址 那么需要以host模式启动: 
+
   docker run -d --net host omage-es:latest
   ```
   ```
