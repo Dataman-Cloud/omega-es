@@ -20,7 +20,7 @@ mysql:
     port: 3306
     maxIdleConns: 5
     maxOpenConns: 50
-    database: "datamanalarm"
+    database: "alarm"
     username: "root"
     password: "dataman1234"
 chronos:

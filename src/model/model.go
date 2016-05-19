@@ -50,3 +50,16 @@ type AlarmHistory struct {
 	Uid       int64     `json:"uid"`
 	Cid       int64     `json:"cid"`
 }
+
+type CronInfo struct {
+	GtNum     int64  `json:"gtnum"`
+	JobId     int64  `json:"jobid"`
+	UserId    int64  `json:"userid"`
+	ClusterId int64  `json:"clusterid"`
+	KeyWord   string `json:"keyword"`
+	AppName   string `json:"appname"`
+	AppAlias  string `json:"appalias"`
+	Ival      int8   `json:"interval"`
+	UserType  string `json:"usertype"`
+	AlarmName string `json:"alarmname"`
+}
