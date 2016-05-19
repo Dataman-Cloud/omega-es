@@ -124,30 +124,6 @@ func CreateLogAlarm(c *echo.Context) error {
 		alarm.Id = aid
 	}
 
-	/*asearch := map[string]interface{}{
-		"gtnum":     alarm.GtNum,
-		"jobid":     alarm.Id,
-		"userid":    userid,
-		"clusterid": int64(clusterid),
-		"keyword":   keyword,
-		"appname":   appalias,
-		"interval":  int8(interval),
-		"usertype":  usertype,
-		"alarmname": alarmname,
-	}*/
-	/*asearch := model.CronInfo{
-		GtNum:     alarm.GtNum,
-		JobId:     alarm.Id,
-		UserId:    userid,
-		ClusterId: int64(clusterid),
-		KeyWord:   keyword,
-		AppName:   appname,
-		AppAlias:  appalias,
-		Ival:      int8(interval),
-		UserType:  usertype,
-		AlarmName: alarmname,
-	}*/
-
 	abody, err := enjson.Marshal(alarm)
 	if err != nil {
 		log.Errorf("create log alarm asearch parse to json string error: %v", err)
@@ -158,22 +134,6 @@ func CreateLogAlarm(c *echo.Context) error {
 	if err != nil {
 		return ReturnError(c, map[string]interface{}{"code": 17006, "data": "add cron job error"})
 	}
-	/*authtoken := SchdulerAuth(usertype, alarmname, userid)
-	scheduleCommand := fmt.Sprintf("curl -XPOST -H 'Content-Type: application/json' -H 'Authorization: %s' http://%s:%d/api/v3/scheduler -d '%s'", authtoken, config.GetConfig().Sh.Host, config.GetConfig().Sh.Port, string(abody))
-
-	jobBody := map[string]interface{}{
-		"name":     alarm.AliasName,
-		"command":  scheduleCommand,
-		"schedule": "R/" + time.Now().Format(time.RFC3339) + "/PT" + fmt.Sprintf("%d", int8(interval)) + "M",
-		"owner":    "yqguo@dataman-inc.com",
-		"async":    false,
-	}
-	//"schedule": "R/2016-04-24T09:03:31Z/PT" + fmt.Sprintf("%d", int8(interval)) + "S",
-	cbody, _ := enjson.Marshal(jobBody)
-	if err = CreateJob(string(cbody)); err != nil {
-		log.Errorf("create log alarm add a chronos job error: %v", err)
-		return ReturnError(c, map[string]interface{}{"code": 17008, "data": "create log alarm add a chronos job error: " + err.Error()})
-	}*/
 
 	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "create log alarm successful"})
 }
@@ -519,29 +479,6 @@ func UpdateLogAlarm(c *echo.Context) error {
 		log.Errorf("update alarm db table error: %v", err)
 		return ReturnError(c, map[string]interface{}{"code": 17015, "data": "updata alarm db table error"})
 	}
-	/*asearch := map[string]interface{}{
-		"gtnum":     alarm.GtNum,
-		"jobid":     alarm.Id,
-		"userid":    alarm.Uid,
-		"clusterid": alarm.Cid,
-		"keyword":   alarm.KeyWord,
-		"appname":   alarm.AppAlias,
-		"interval":  alarm.Ival,
-		"usertype":  alarm.UserType,
-		"alarmname": alarm.AlarmName,
-	}*/
-	/*asearch := model.CronInfo{
-		GtNum:     alarm.GtNum,
-		JobId:     alarm.Id,
-		UserId:    alarm.Uid,
-		ClusterId: alarm.Cid,
-		KeyWord:   alarm.KeyWord,
-		AppName:   alarm.AppName,
-		AppAlias:  alarm.AppAlias,
-		Ival:      alarm.Ival,
-		UserType:  alarm.UserType,
-		AlarmName: alarm.AlarmName,
-	}*/
 	abody, err := enjson.Marshal(alarm)
 	if err != nil {
 		log.Errorf("update log alarm asearch parse to json string error: %v", err)
@@ -551,24 +488,6 @@ func UpdateLogAlarm(c *echo.Context) error {
 		log.Errorf("restart alarm error")
 		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "restart alarm error"})
 	}
-
-	/*authtoken := SchdulerAuth(alarm.UserType, alarm.AlarmName, alarm.Uid)
-	scheduleCommand := fmt.Sprintf("curl -XPOST -H 'Content-Type: application/json' -H 'Authorization: %s' http://%s:%d/api/v3/scheduler -d '%s'", authtoken, config.GetConfig().Sh.Host, config.GetConfig().Sh.Port, string(abody))
-
-	jobBody := map[string]interface{}{
-		"name":     alarm.AliasName,
-		"command":  scheduleCommand,
-		"schedule": "R/" + time.Now().Format(time.RFC3339) + "/PT" + fmt.Sprintf("%d", int8(interval)) + "M",
-		"owner":    "yqguo@dataman-inc.com",
-		"async":    false,
-	}
-	cbody, _ := enjson.Marshal(jobBody)*/
-	/*authtoken := SchdulerAuth(usertype, alarmname, userid)
-	_ = cbody
-	/*if err = UpdateJob(string(cbody)); err != nil {
-		log.Errorf("update log alarm add a chronos job error: %v", err)
-		return ReturnError(c, map[string]interface{}{"code": 17008, "data": "update log alarm add a chronos job error: " + err.Error()})
-	}*/
 
 	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "update log alarm successful"})
 }
@@ -598,11 +517,6 @@ func StopLogAlarm(c *echo.Context) error {
 		log.Errorf("stop log alarm update alarm status error: %v", err)
 		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop log alarm update alarm status error"})
 	}
-	/*err = DeleteJob(alarm.AliasName)
-	if err != nil {
-		log.Errorf("stop log alarm stop schduler job error: %v", err)
-		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "stop log alarm stop schduler job error"})
-	}*/
 	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "stop alarm successful"})
 }
 
@@ -624,33 +538,6 @@ func RestartLogAlarm(c *echo.Context) error {
 		log.Errorf("restart log alarm update alarm status error: %v", err)
 		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "restart log alarm update alarm status error"})
 	}
-	/*if err = cache.AddAlarm(&alarm); err != nil {
-		log.Errorf("restart alarm error")
-		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "restart alarm error"})
-	}*/
-	/*asearch := map[string]interface{}{
-		"jobid":     alarm.Id,
-		"gtnum":     alarm.GtNum,
-		"userid":    alarm.Uid,
-		"clusterid": alarm.Cid,
-		"keyword":   alarm.KeyWord,
-		"appname":   alarm.AppAlias,
-		"interval":  alarm.Ival,
-		"usertype":  alarm.UserType,
-		"alarmname": alarm.AlarmName,
-	}*/
-	/*asearch := model.CronInfo{
-		GtNum:     alarm.GtNum,
-		JobId:     alarm.Id,
-		UserId:    alarm.Uid,
-		ClusterId: alarm.Cid,
-		KeyWord:   alarm.KeyWord,
-		AppName:   alarm.AppName,
-		AppAlias:  alarm.AppAlias,
-		Ival:      alarm.Ival,
-		UserType:  alarm.UserType,
-		AlarmName: alarm.AlarmName,
-	}*/
 	abody, err := enjson.Marshal(alarm)
 	if err != nil {
 		log.Errorf("restart log alarm asearch parse to json string error: %v", err)
@@ -660,21 +547,6 @@ func RestartLogAlarm(c *echo.Context) error {
 		log.Errorf("restart alarm error")
 		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "restart alarm error"})
 	}
-	/*authtoken := SchdulerAuth(alarm.UserType, alarm.AlarmName, alarm.Uid)
-	scheduleCommand := fmt.Sprintf("curl -XPOST -H 'Content-Type: application/json' -H 'Authorization: %s' http://%s:%d/api/v3/scheduler -d '%s'", authtoken, config.GetConfig().Sh.Host, config.GetConfig().Sh.Port, string(abody))
-	jobBody := map[string]interface{}{
-		"name":     alarm.AliasName,
-		"command":  scheduleCommand,
-		"schedule": "R/" + time.Now().Format(time.RFC3339) + "/PT" + fmt.Sprintf("%d", alarm.Ival) + "M",
-		"owner":    "yqguo@dataman-inc.com",
-		"async":    false,
-	}
-	cbody, _ := enjson.Marshal(jobBody)
-	_ = cbody*/
-	/*if err = CreateJob(string(cbody)); err != nil {
-		log.Errorf("restart log alarm add a chronos job error: %v", err)
-		return ReturnError(c, map[string]interface{}{"code": 17008, "data": "restart log alarm add a chronos job error: " + err.Error()})
-	}*/
 
 	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "restart log alarm successful"})
 }

@@ -57,7 +57,6 @@ func initEcho() {
 	api := e.Group("/api/v3")
 	{
 		api.Get("/health/log", Health)
-		//api.Post("/scheduler", JobExec)
 	}
 
 	log.Info("listening server address: ", addr)
