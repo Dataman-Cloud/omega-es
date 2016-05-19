@@ -20,8 +20,8 @@ const (
 
 func init() {
 	mindex = uuid.Rand().Hex()
-	go RefreshHost()
-	go CleanDieHost()
+	//go RefreshHost()
+	//go CleanDieHost()
 	go PollAlarm()
 }
 

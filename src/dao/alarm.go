@@ -164,19 +164,6 @@ func GetHistoryByJobId(uid, pcount, pnum int64, sortby, order, keyword string) (
 	if pnum <= 0 {
 		pnum = 1
 	}
-	/*if sortby == "" || sortby == "exectime" {
-		sortby = "ah.exectime"
-	} else if sortby == "keyword" {
-		sortby = "a.keyword"
-	} else if sortby == "resultnum" {
-		sortby = "ah.resultnum"
-	} else if sortby == "jobid" {
-		sortby = "ah.jobid"
-	} else if sortby == "appname" {
-		sortby = "a.appname"
-	} else if sortby == "id" {
-		sortby = "ah.id"
-	}*/
 	if sortby == "" {
 		sortby = "exectime"
 	}
@@ -185,11 +172,6 @@ func GetHistoryByJobId(uid, pcount, pnum int64, sortby, order, keyword string) (
 	}
 	db := util.DB()
 	historys := []model.AlarmHistory{}
-	/*sql := `select ah.id as id, ah.jobid as jobid, ah.isalarm as isalarm, ah.exectime as exectime, ah.resultnum as resultnum, a.appname as appname, a.gtnum as gtnum, a.ival as ival, a.keyword as keyword from alarmhistory as ah, alarm as a where ah.jobid = a.id and ah.isalarm = true and a.uid = ?`
-	if keyword != "" {
-		sql = sql + ` and a.appname like '%` + keyword + `%'`
-	}
-	sql = sql + ` order by ` + sortby + ` ` + order + ` limit ?,?`*/
 	sql := `select * from alarmhistory where uid = ?`
 	if keyword != "" {
 		sql = sql + ` and appname like '%` + keyword + `%'`
