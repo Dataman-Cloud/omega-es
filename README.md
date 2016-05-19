@@ -20,14 +20,15 @@ go build
   docker build -t omage-es .
   ```
   ```
-  vim omega-es.yaml.sample 
+  vim omega-es.yaml.sample  把该配置的都配置上 
   ```
+  如果你上面配置中没有`127.0.0.1`的地址 那么用如下方式启动:
   ```
   docker run -d omage-es:latest
   ``` 
-  or
+  如果你上面配置中有`127.0.0.1`的地址 那么需要以host模式启动: 
   ```
-  docker run -d omage-es:latest
+  docker run -d --net host omage-es:latest
   ```
   ```
   启动成功后 omega-es 默认监听5009 端口
