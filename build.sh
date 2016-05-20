@@ -1,5 +1,5 @@
 #!/bin/sh
-apk add --update go
+#apk add --update go
 mkdir -p /go/src/github.com/Dataman-Cloud/omega-es
 mkdir -p $HOME/.omega/
 mkdir  /etc/omega/
@@ -14,7 +14,7 @@ mv omega-es.yaml.sample /etc/omega/omega-es.yaml && \
 mv sql /bin/sql && \
 cd src && go build && mv src /bin/omega-es
 #mv omega-es.yaml $HOME/.omega/ && \
-apk del go
+#apk del go
 rm -rf /go
 rm -rf /src
 rm -rf /var/cache/apk/*
