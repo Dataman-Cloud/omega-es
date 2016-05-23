@@ -1,6 +1,7 @@
 package es
 
 import (
+	"github.com/Dataman-Cloud/omega-es/src/dao"
 	. "github.com/Dataman-Cloud/omega-es/src/util"
 	log "github.com/cihub/seelog"
 	"github.com/garyburd/redigo/redis"
@@ -17,7 +18,7 @@ func Health(c *echo.Context) error {
 	ma := map[string]interface{}{
 		"status": 0,
 	}
-	start := time.Now().UnixNano()
+	start := time.Now().Unix()
 	_, err := Conn.AllNodesInfo()
 	mes := make(map[string]interface{})
 	if err == nil {
@@ -27,7 +28,7 @@ func Health(c *echo.Context) error {
 		ma["status"] = 1
 	}
 	end := time.Now().UnixNano()
-	mes["time"] = int((end - start) / 1000000)
+	mes["time"] = end - start
 
 	mall := map[string]interface{}{
 		"elasticsearch": mes,
@@ -44,12 +45,22 @@ func Health(c *echo.Context) error {
 		mredis["status"] = 1
 		ma["status"] = 1
 	}
-	end = time.Now().UnixNano()
-	mredis["time"] = int((end - start) / 1000000)
+	end = time.Now().Unix()
+	mredis["time"] = end - start
 	mall["redis"] = mredis
-	aend := time.Now().UnixNano()
-	ma["time"] = int((aend - astart) / 1000000)
+	aend := time.Now().Unix()
+	ma["time"] = aend - astart
 	mall["omegaEs"] = ma
+
+	mmsql := make(map[string]interface{})
+	mysqlstart := time.Now().Unix()
+	if err = dao.Ping(); err == nil {
+		mmsql["status"] = 0
+	} else {
+		mmsql["status"] = 1
+	}
+	mmsql["time"] = time.Now().Unix() - mysqlstart
+	mall["mysql"] = mmsql
 	return c.JSON(http.StatusOK, mall)
 }
 
