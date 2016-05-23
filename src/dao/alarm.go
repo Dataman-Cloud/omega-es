@@ -6,6 +6,11 @@ import (
 	log "github.com/cihub/seelog"
 )
 
+func Ping() error {
+	db := util.DB()
+	return db.Ping()
+}
+
 func ExistAlarm(uid int64, utype, alarmname string) (int, error) {
 	db := util.DB()
 	count := 0
