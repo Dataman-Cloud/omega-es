@@ -290,7 +290,7 @@ func JobExec(body []byte) error {
 
 	endtime := time.Now().Unix()
 	starttime := endtime - int64(interval)*60
-	query := `{"query":{"bool":{"must":[{"match":{"msg":{"query":"` + keyword +
+	query := `{"query":{"bool":{"must":[{"term":{"clusterid":"` + strconv.Itoa(int(clusterid)) + `"}},{"match":{"msg":{"query":"` + keyword +
 		`","analyzer":"ik"}}},{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) + `","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}`
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + time.Now().String()[:10]
 	gid, err := GetUserType(int64(userid), int64(clusterid))

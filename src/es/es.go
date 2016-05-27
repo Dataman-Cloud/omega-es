@@ -208,6 +208,7 @@ func SearchIndex(c *echo.Context) error {
 	} else {
 		esindex += "*"
 	}
+	esindex = ""
 	log.Debug(esindex, estype, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
@@ -318,7 +319,11 @@ func SearchContext(c *echo.Context) error {
 			  },
 			  {
 			    "term": {"typename": "` + appname + `"}
-			  },`
+			  },
+			  {
+			    "term": {"clusterid": "` + strconv.Itoa(int(clusterid)) + `"}
+			  },
+			  `
 	if sok {
 		query += `
 			  {
@@ -329,9 +334,6 @@ func SearchContext(c *echo.Context) error {
 	query += `
 			  {
 			    "term": {"ipport": "` + ipport + `"}
-			  },
-			  {
-			    "term": {"clusterid": "` + strconv.Itoa(int(clusterid)) + `"}
 			  }
 			]
 		      }
@@ -354,6 +356,7 @@ func SearchContext(c *echo.Context) error {
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + timestamp[:10]
 	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	estype := ""
+	esindex = ""
 	log.Debug(esindex, estype, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
