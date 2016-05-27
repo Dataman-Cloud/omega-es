@@ -356,7 +356,7 @@ func SearchContext(c *echo.Context) error {
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + timestamp[:10]
 	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	estype := ""
-	esindex = ""
+	esindex = "*"
 	log.Debug(esindex, estype, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
