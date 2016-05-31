@@ -30,7 +30,7 @@ func CountAlarms(uid int64, keyword string) (int, error) {
 
 func AddAlarm(alarm *model.LogAlarm) (int64, error) {
 	db := util.DB()
-	sql := `insert into alarm(uid, cid, appname, ival, gtnum, alarmname, usertype, keyword, emails, aliasname, createtime, appalias) values(:uid, :cid, :appname, :ival, :gtnum, :alarmname, :usertype, :keyword, :emails, :aliasname, :createtime, :appalias)`
+	sql := `insert into alarm(uid, cid, appname, ival, gtnum, alarmname, usertype, keyword, emails, aliasname, createtime, appalias,ipport,scaling,maxs,mins,appid) values(:uid, :cid, :appname, :ival, :gtnum, :alarmname, :usertype, :keyword, :emails, :aliasname, :createtime, :appalias, :ipport, :scaling, :maxs, :mins, :appid)`
 	stmt, err := db.PrepareNamed(sql)
 	if err != nil {
 		log.Error("insert into alarm error: ", err)
@@ -129,7 +129,7 @@ func DeleteAlarmByUser(alarm *model.LogAlarm) error {
 
 func AddAlaramHistory(ah *model.AlarmHistory) (int64, error) {
 	db := util.DB()
-	sql := `insert into alarmhistory(jobid, isalarm, exectime, resultnum,uid,cid,keyword,appname,gtnum,ival) values (:jobid, :isalarm, :exectime, :resultnum, :uid, :cid, :keyword, :appname, :gtnum, :ival)`
+	sql := `insert into alarmhistory(jobid, isalarm, exectime, resultnum,uid,cid,keyword,appname,gtnum,ival,ipport,scaling,maxs,mins) values (:jobid, :isalarm, :exectime, :resultnum, :uid, :cid, :keyword, :appname, :gtnum, :ival,:ipport,:scaling,:maxs,:mins)`
 	stmt, err := db.PrepareNamed(sql)
 	if err != nil {
 		log.Error("insert into alarm history error: ", err)
@@ -188,7 +188,7 @@ func GetHistoryByJobId(uid, pcount, pnum int64, sortby, order, keyword string) (
 
 func UpdateAlarm(alarm *model.LogAlarm) error {
 	db := util.DB()
-	sql := `update alarm set cid=:cid, appalias=:appalias, appname=:appname, ival=:ival, gtnum=:gtnum, usertype=:usertype, keyword=:keyword, emails=:emails where id=:id`
+	sql := `update alarm set cid=:cid, appalias=:appalias, appname=:appname, ival=:ival, gtnum=:gtnum, usertype=:usertype, keyword=:keyword, emails=:emails, ipport=:ipport, scaling=:scaling, maxs=:maxs, mins=:mins where id=:id`
 	_, err := db.NamedExec(sql, alarm)
 	return err
 }

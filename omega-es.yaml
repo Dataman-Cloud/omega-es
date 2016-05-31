@@ -22,7 +22,7 @@ mysql:
     maxOpenConns: 50
     database: "alarm"
     username: "root"
-    password: "dataman1234"
+    password: "111111"
 chronos:
     host: "10.3.20.55"
     port: 5097
