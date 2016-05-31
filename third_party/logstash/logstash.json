@@ -104,7 +104,6 @@
                 },
                 "msg": {
                     "type": "string",
-                    "analyzer": "ik",
                     "store": "yes"
                 }
             },
