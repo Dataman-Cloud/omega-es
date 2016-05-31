@@ -3,9 +3,9 @@ package es
 import (
 	"github.com/Dataman-Cloud/omega-es/src/dao"
 	. "github.com/Dataman-Cloud/omega-es/src/util"
+	"github.com/Jeffail/gabs"
 	log "github.com/cihub/seelog"
 	"github.com/garyburd/redigo/redis"
-	"github.com/jeffail/gabs"
 	"github.com/labstack/echo"
 	"net/http"
 	"strconv"

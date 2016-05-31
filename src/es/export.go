@@ -3,8 +3,8 @@ package es
 import (
 	"encoding/json"
 	. "github.com/Dataman-Cloud/omega-es/src/util"
+	"github.com/Jeffail/gabs"
 	log "github.com/cihub/seelog"
-	"github.com/jeffail/gabs"
 	"github.com/labstack/echo"
 	"strconv"
 	"strings"

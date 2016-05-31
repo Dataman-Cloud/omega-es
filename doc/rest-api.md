@@ -80,7 +80,11 @@ curl -X POST http://10.3.20.53:5009/es/alarm/create \
     "alarmname": "alarmtest",
     "usertype": "user",
     "keyword": "error",
-    "emails": "yqguo@dataman-inc.com"
+    "emails": "yqguo@dataman-inc.com",
+    "ipport": "ipport,ipport1",
+    "scaling": false,
+    "mins": 1,
+    "maxs": 2
 }'
 ```
 
@@ -98,7 +102,11 @@ curl -X PUT http://10.3.20.53:5009/es/alarm/update \
     "gtnum": 10,
     "usertype": "user",
     "keyword": "error",
-    "emails": "yqguo@dataman-inc.com"
+    "emails": "yqguo@dataman-inc.com",
+    "ipport": "ipport,ipport1",
+    "scaling": false,
+    "mins": 1,
+    "maxs": 2
 }'
 ```
 ####GET `/es/alarm/:id`

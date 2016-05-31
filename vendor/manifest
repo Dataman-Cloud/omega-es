@@ -10,7 +10,7 @@
 		{
 			"importpath": "github.com/Jeffail/gabs",
 			"repository": "https://github.com/Jeffail/gabs",
-			"revision": "ee1575a53249b51d636e62464ca43a13030afdb5",
+			"revision": "c28ac41b517d24bf381d39d5a294fac6536d81fa",
 			"branch": "master",
 			"notests": true
 		},
@@ -57,12 +57,6 @@
 			"importpath": "github.com/hashicorp/hcl",
 			"repository": "https://github.com/hashicorp/hcl",
 			"revision": "578dd9746824a54637686b51a41bad457a56bcef",
-			"branch": "master"
-		},
-		{
-			"importpath": "github.com/jeffail/gabs",
-			"repository": "https://github.com/jeffail/gabs",
-			"revision": "b69c9e648a2529c8d7b927ba7f87bc7fe0b3b0ea",
 			"branch": "master"
 		},
 		{

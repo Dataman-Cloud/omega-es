@@ -9,8 +9,8 @@ import (
 	"github.com/Dataman-Cloud/omega-es/src/dao"
 	"github.com/Dataman-Cloud/omega-es/src/model"
 	. "github.com/Dataman-Cloud/omega-es/src/util"
+	"github.com/Jeffail/gabs"
 	log "github.com/cihub/seelog"
-	"github.com/jeffail/gabs"
 	"github.com/labstack/echo"
 	"github.com/sluu99/uuid"
 	"strconv"
@@ -39,6 +39,11 @@ func CreateLogAlarm(c *echo.Context) error {
 	if !ok {
 		log.Error("create log alarm param can't get clusterid")
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "create log alarm param can't get clusterid"})
+	}
+	appid, ok := json.Path("appid").Data().(float64)
+	if !ok {
+		log.Error("create log alarm param can't get appid")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "create log alarm param can't get appid"})
 	}
 	appalias, ok := json.Path("appalias").Data().(string)
 	if !ok {
@@ -92,6 +97,23 @@ func CreateLogAlarm(c *echo.Context) error {
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "create log alarm param can't get emails"})
 	}
 
+	scaling, ok := json.Path("scaling").Data().(bool)
+	if !ok {
+		log.Error("create log alarm param can't get scaling")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "create log alarm param can't get scaling"})
+	}
+	maxs, ok := json.Path("maxs").Data().(float64)
+	if !ok {
+		maxs = 0
+		//log.Error("create log alarm param can't get maxs")
+		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "create log alarm param can't get maxs"})
+	}
+	mins, ok := json.Path("mins").Data().(float64)
+	if !ok {
+		mins = 0
+		//log.Error("create log alarm param can't get mins")
+		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "create log alarm param can't get scaling"})
+	}
 	if count, err := dao.ExistAlarm(userid, usertype, alarmname); err != nil {
 		log.Errorf("create log alarm judge alarm exist error: %v.", err)
 		return ReturnError(c, map[string]interface{}{"code": 17004, "data": "cleate log alarm judge exist error: " + err.Error()})
@@ -115,6 +137,13 @@ func CreateLogAlarm(c *echo.Context) error {
 		Emails:     emails,
 		AliasName:  aliasname,
 		CreateTime: time.Now(),
+		Scaling:    scaling,
+		Maxs:       int8(maxs),
+		Mins:       int8(mins),
+		AppId:      int64(appid),
+	}
+	if ipport, ok := json.Path("ipport").Data().(string); ok {
+		alarm.Ipport = ipport
 	}
 
 	if aid, err := dao.AddAlarm(alarm); err != nil {
@@ -280,6 +309,22 @@ func JobExec(body []byte) error {
 		return errors.New("exec chronos job param can't get usertype")
 		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get usertype"})
 	}
+	scaling, ok := json.Path("scaling").Data().(bool)
+	if !ok {
+		log.Error("exec chronos job param can't get scaling")
+		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get scaling"})
+	}
+	maxs, ok := json.Path("maxs").Data().(float64)
+	if !ok {
+		log.Error("exec chronos job param can't get maxs")
+		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get maxs"})
+	}
+	mins, ok := json.Path("mins").Data().(float64)
+	if !ok {
+		log.Error("exec chronos job param can't get mins")
+		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get scaling"})
+	}
+	_, _, _ = scaling, maxs, mins
 
 	/*authtoken := c.Request().Header.Get("Authorization")
 
@@ -290,7 +335,11 @@ func JobExec(body []byte) error {
 
 	endtime := time.Now().Unix()
 	starttime := endtime - int64(interval)*60
-	query := `{"query":{"bool":{"must":[{"term":{"clusterid":"` + strconv.Itoa(int(clusterid)) + `"}},{"match":{"msg":{"query":"` + keyword +
+	query := `{"query":{"bool":{"must":[{"term":{"clusterid":"` + strconv.Itoa(int(clusterid)) + `"}},`
+	/*if ipport, ok := json.Path("ipport").Data().(string); ok {
+		query = query + `{"terms":{"ipport":["` + strings.Replace(ipport, ",", "\",\"", -1) + `"],"minimum_match":1}}`
+	}*/
+	query = query + `{"match":{"msg":{"query":"` + keyword +
 		`","analyzer":"ik"}}},{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) + `","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}`
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + time.Now().String()[:10]
 	gid, err := GetUserType(int64(userid), int64(clusterid))
@@ -322,6 +371,10 @@ func JobExec(body []byte) error {
 		AppName:   alarm.AppName,
 		GtNum:     alarm.GtNum,
 		Ival:      alarm.Ival,
+		Ipport:    alarm.Ipport,
+		Scaling:   alarm.Scaling,
+		Maxs:      alarm.Maxs,
+		Mins:      alarm.Mins,
 	}
 	if int64(out.Count) >= alarm.GtNum {
 		alarmHistory.IsAlarm = true
@@ -457,6 +510,23 @@ func UpdateLogAlarm(c *echo.Context) error {
 		log.Error("update log alarm param can'get get emails")
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get emails"})
 	}
+	scaling, ok := json.Path("scaling").Data().(bool)
+	if !ok {
+		log.Error("update log alarm param can't get scaling")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get scaling"})
+	}
+	maxs, ok := json.Path("maxs").Data().(float64)
+	if !ok {
+		maxs = 0
+		//log.Error("update log alarm param can't get maxs")
+		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get maxs"})
+	}
+	mins, ok := json.Path("mins").Data().(float64)
+	if !ok {
+		mins = 0
+		//log.Error("update log alarm param can't get mins")
+		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get scaling"})
+	}
 	alarm, err := dao.GetAlarmById(int64(id))
 	if err != nil {
 		log.Errorf("get alarm error: %v", err)
@@ -470,6 +540,12 @@ func UpdateLogAlarm(c *echo.Context) error {
 	alarm.UserType = usertype
 	alarm.KeyWord = keyword
 	alarm.Emails = emails
+	alarm.Scaling = scaling
+	alarm.Maxs = int8(maxs)
+	alarm.Mins = int8(mins)
+	if ipport, ok := json.Path("ipport").Data().(string); ok {
+		alarm.Ipport = ipport
+	}
 	if err = cache.UpdateAlarm(&alarm); err != nil {
 		log.Errorf("update alarm error")
 		return ReturnError(c, map[string]interface{}{"code": 17015, "data": "update alarm error"})
