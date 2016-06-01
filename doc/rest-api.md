@@ -81,7 +81,6 @@ curl -X POST http://10.3.20.53:5009/es/alarm/create \
     "usertype": "user",
     "keyword": "error",
     "emails": "yqguo@dataman-inc.com",
-    "ipport": "ipport,ipport1",
     "scaling": false,
     "mins": 1,
     "maxs": 2
