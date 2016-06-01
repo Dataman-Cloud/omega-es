@@ -14,7 +14,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/sluu99/uuid"
 	"strconv"
-	"strings"
+	//"strings"
 	"time"
 )
 
@@ -142,9 +142,6 @@ func CreateLogAlarm(c *echo.Context) error {
 		Mins:       int8(mins),
 		AppId:      int64(appid),
 	}
-	if ipport, ok := json.Path("ipport").Data().(string); ok {
-		alarm.Ipport = ipport
-	}
 
 	if aid, err := dao.AddAlarm(alarm); err != nil {
 		log.Errorf("create log alarm insert into alarm table error: %v", err)
@@ -248,81 +245,64 @@ func DeleteLogAlarm(c *echo.Context) error {
 
 //func JobExec(c *echo.Context) error {
 func JobExec(body []byte) error {
-	/*body, err := ReadBody(c)
-	if err != nil {
-		log.Error("exec chronos job cant't get request body")
-		return ReturnError(c, map[string]interface{}{"code": 17001, "data": "exec chronos job can't get request body"})
-	}*/
 	json, err := gabs.ParseJSON(body)
 	if err != nil {
 		log.Error("exec chronos job request parse to json error: ", err)
 		return err
-		//return ReturnError(c, map[string]interface{}{"code": 17002, "data": "exec chronos job request parse to json error"})
 	}
 
 	userid, ok := json.Path("uid").Data().(float64)
 	if !ok {
 		log.Error("exec chronos job param can't get userid")
 		return errors.New("exec chronos jbo param can't get userid")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get userid"})
 	}
 
 	clusterid, ok := json.Path("cid").Data().(float64)
 	if !ok {
 		log.Error("exec chronos job param can't get clusterid")
 		return errors.New("exec chronos job param can't get clusterid")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get clusterid"})
 	}
 
-	//appname, ok := json.Path("appname").Data().(string)
 	appalias, ok := json.Path("appalias").Data().(string)
 	if !ok {
 		log.Error("exec chronos job param can't get appname")
 		return errors.New("exec chronos job param can't get appname")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get appname"})
 	}
 
 	keyword, ok := json.Path("keyword").Data().(string)
 	if !ok {
 		log.Error("exec chronos job param can't get keyword")
 		return errors.New("exec chronos job param can't get keyword")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get keyword"})
 	}
 
 	alarmname, ok := json.Path("alarmname").Data().(string)
 	if !ok {
 		log.Error("exec chronos job param can't get alarmname")
 		return errors.New("exec chronos job param can't get alarmname")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get keyword"})
 	}
 
 	interval, ok := json.Path("ival").Data().(float64)
 	if !ok {
 		log.Error("exec chronos job param can't get interval")
 		return errors.New("exec chronos job param can't get interval")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get inveral"})
 	}
 
 	usertype, ok := json.Path("usertype").Data().(string)
 	if !ok {
 		log.Error("exec chronos job param can't get usertype")
 		return errors.New("exec chronos job param can't get usertype")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get usertype"})
 	}
 	scaling, ok := json.Path("scaling").Data().(bool)
 	if !ok {
 		log.Error("exec chronos job param can't get scaling")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get scaling"})
 	}
 	maxs, ok := json.Path("maxs").Data().(float64)
 	if !ok {
 		log.Error("exec chronos job param can't get maxs")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get maxs"})
 	}
 	mins, ok := json.Path("mins").Data().(float64)
 	if !ok {
 		log.Error("exec chronos job param can't get mins")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "exec chronos job param can't get scaling"})
 	}
 	_, _, _ = scaling, maxs, mins
 
@@ -335,33 +315,75 @@ func JobExec(body []byte) error {
 
 	endtime := time.Now().Unix()
 	starttime := endtime - int64(interval)*60
-	query := `{"query":{"bool":{"must":[{"term":{"clusterid":"` + strconv.Itoa(int(clusterid)) + `"}},`
-	/*if ipport, ok := json.Path("ipport").Data().(string); ok {
+	/*query := `{"query":{"bool":{"must":[{"term":{"clusterid":"` + strconv.Itoa(int(clusterid)) + `"}},`
+	if ipport, ok := json.Path("ipport").Data().(string); ok {
 		query = query + `{"terms":{"ipport":["` + strings.Replace(ipport, ",", "\",\"", -1) + `"],"minimum_match":1}}`
-	}*/
+	}
 	query = query + `{"match":{"msg":{"query":"` + keyword +
-		`","analyzer":"ik"}}},{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) + `","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}`
+		`","analyzer":"ik"}}},{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) + `","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}`*/
+	query := `{"size":0,"query":{"filtered":{"query":{"bool":{"must":[{"term":{"clusterid":` + fmt.Sprintf("%d", int64(clusterid)) + `}},` +
+		`{"term":{"typename":"` + appalias + `"}},{"match":{"msg":{"query":"` + keyword + `","analyzer":"ik"}}}]}},` +
+		`"filter":{"bool":{"must":[{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) +
+		`","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}},"aggs":{"ds":{"terms":{"field":"ipport","size":0}}}}`
 	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + time.Now().String()[:10]
 	gid, err := GetUserType(int64(userid), int64(clusterid))
 	if err == nil {
 		esindex = "logstash-*" + gid + "-" + time.Now().String()[:10]
 	}
 	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appalias
-	out, err := Conn.Count(esindex, estype, nil, query)
-	log.Debug("---", esindex, estype, query, out.Count)
+	esindex = "*"
+	estype = ""
+	//out, err := Conn.Count(esindex, estype, nil, query)
+	out, err := Conn.Search(esindex, estype, nil, query)
+	log.Debug("---", esindex, estype, query, err, string(out.RawJSON))
 	if err != nil {
 		log.Errorf("exec chronos job search es count error: %v", err)
 		return err
-		//return ReturnError(c, map[string]interface{}{"code": 17010, "data": "exec chronos job search es count error: " + err.Error()})
 	}
 	alarm, err := dao.GetAlarmByName(usertype, alarmname, int64(userid))
 	if err != nil {
 		log.Errorf("exec chronos job can't get alarm by alarmname error: %v", err)
 		return err
-		//return ReturnError(c, map[string]interface{}{"code": 17011, "data": "exec chronos job can't get alarm by alarmname error: " + err.Error()})
 	}
+	rawjson, err := gabs.ParseJSON(out.RawJSON)
+	if err != nil {
+		log.Errorf("exec chronos job can't rawjson parse to json error: %v", err)
+		return err
+	}
+
+	bs, err := rawjson.Path("aggregations.ds.buckets").Children()
+	if err != nil {
+		log.Errorf("exec chronos job get buckets children error: %v", err)
+		return err
+	}
+
 	cache.UpdateScheduTime(alarm.Id)
-	alarmHistory := &model.AlarmHistory{
+	if len(bs) == 0 {
+		return nil
+	}
+	for _, b := range bs {
+		if int64(b.Path("doc_count").Data().(float64)) < alarm.GtNum {
+			break
+		}
+		alarmHistory := &model.AlarmHistory{
+			JobId:     alarm.Id,
+			ExecTime:  time.Now(),
+			ResultNum: int64(b.Path("doc_count").Data().(float64)),
+			Uid:       int64(userid),
+			Cid:       int64(clusterid),
+			KeyWord:   keyword,
+			AppName:   alarm.AppName,
+			GtNum:     alarm.GtNum,
+			Ival:      alarm.Ival,
+			Ipport:    b.Path("key").Data().(string),
+			Scaling:   alarm.Scaling,
+			Maxs:      alarm.Maxs,
+			Mins:      alarm.Mins,
+			IsAlarm:   true,
+		}
+		dao.AddAlaramHistory(alarmHistory)
+	}
+	/*alarmHistory := &model.AlarmHistory{
 		JobId:     alarm.Id,
 		ExecTime:  time.Now(),
 		ResultNum: int64(out.Count),
@@ -381,7 +403,6 @@ func JobExec(body []byte) error {
 		if aid, err := dao.AddAlaramHistory(alarmHistory); err != nil {
 			log.Errorf("exec chronos job insert into alarm history error: %v", err)
 			return errors.New("exec chronos job insert into alarm history error")
-			//return ReturnError(c, map[string]interface{}{"code": 17012, "data": "exec chronos job insert into alarm history error: " + err.Error()})
 		} else {
 			memail := map[string]interface{}{
 				"template": "alarm",
@@ -402,9 +423,8 @@ func JobExec(body []byte) error {
 		}
 	} else {
 		alarmHistory.IsAlarm = false
-	}
+	}*/
 	return nil
-	//return ReturnOK(c, map[string]interface{}{"code": 1, "data": "add alarm history successful"})
 }
 
 func GetAlarmHistory(c *echo.Context) error {
@@ -543,9 +563,6 @@ func UpdateLogAlarm(c *echo.Context) error {
 	alarm.Scaling = scaling
 	alarm.Maxs = int8(maxs)
 	alarm.Mins = int8(mins)
-	if ipport, ok := json.Path("ipport").Data().(string); ok {
-		alarm.Ipport = ipport
-	}
 	if err = cache.UpdateAlarm(&alarm); err != nil {
 		log.Errorf("update alarm error")
 		return ReturnError(c, map[string]interface{}{"code": 17015, "data": "update alarm error"})

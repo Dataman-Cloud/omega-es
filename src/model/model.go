@@ -36,7 +36,6 @@ type LogAlarm struct {
 	AliasName  string    `json:"aliasname"`
 	CreateTime time.Time `json:"createtime"`
 	Isnotice   bool      `json:"isnotice"`
-	Ipport     string    `json:"ipport"`
 	Scaling    bool      `json:"scaling"`
 	Maxs       int8      `json:"maxs"`
 	Mins       int8      `json:"mins"`
@@ -54,10 +53,10 @@ type AlarmHistory struct {
 	KeyWord   string    `json:"keyword"`
 	Uid       int64     `json:"uid"`
 	Cid       int64     `json:"cid"`
-	Ipport    string    `json:"ipport"`
 	Scaling   bool      `json:"scaling"`
 	Maxs      int8      `json:"maxs"`
 	Mins      int8      `json:"mins"`
+	Ipport    string    `json:"ipport"`
 }
 
 type CronInfo struct {
