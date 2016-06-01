@@ -105,12 +105,12 @@ func DeleteAlarmByJobId(jobid int64) error {
 		tx.Rollback()
 		return err
 	}
-	/*_, err = tx.Exec("delete from alarmhistory where jobid = ?", jobid)
+	_, err = tx.Exec("delete from alarmhistory where jobid = ?", jobid)
 	if err != nil {
 		log.Errorf("delete alarmhistor error: %v", err)
 		tx.Rollback()
 		return err
-	}*/
+	}
 	err = tx.Commit()
 	if err != nil {
 		log.Errorf("delete alarm commit error: %v", err)
