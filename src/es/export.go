@@ -102,6 +102,7 @@ func ExportIndex(c *echo.Context) error {
 	} else {
 		esindex += "*"
 	}
+	esindex = "*"
 	log.Debug(esindex, estype, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
@@ -209,6 +210,7 @@ func ExportContext(c *echo.Context) error {
 	            }
 		  }`
 	esindex := "logstash-*" + uid + "-" + timestamp[:10]
+	esindex = "*"
 	estype := ""
 	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	out, err := Conn.Search(esindex, estype, nil, query)
