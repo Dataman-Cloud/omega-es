@@ -31,9 +31,6 @@ func initEcho() {
 	{
 		es.Post("/index", SearchIndex)
 		es.Post("/context", SearchContext)
-		es.Post("/seniorsearch/:userId", SeniorSearch)
-		es.Get("/appagg/:userId", AppAgg)
-		es.Get("/topagg/:field/:userId", TopAgg)
 	}
 
 	ea := e.Group("/es/alarm", auth)

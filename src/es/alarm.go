@@ -306,13 +306,6 @@ func JobExec(body []byte) error {
 	}
 	_, _, _ = scaling, maxs, mins
 
-	/*authtoken := c.Request().Header.Get("Authorization")
-
-	if authtoken != SchdulerAuth(usertype, alarmname, int64(userid)) {
-		log.Error("Illegal request")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "Illegal request"})
-	}*/
-
 	endtime := time.Now().Unix()
 	starttime := endtime - int64(interval)*60
 	/*query := `{"query":{"bool":{"must":[{"term":{"clusterid":"` + strconv.Itoa(int(clusterid)) + `"}},`
