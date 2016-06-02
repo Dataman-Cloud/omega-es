@@ -136,7 +136,7 @@ func AppExtend(appid int64, maxs uint64) error {
 	conn := util.Open()
 	defer conn.Close()
 	m, err := redis.Uint64(conn.Do("HGET", alarmscaling, appid))
-	if err == nil {
+	if err != nil {
 		return err
 	}
 	if m == maxs {
