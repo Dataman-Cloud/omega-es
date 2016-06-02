@@ -25,3 +25,11 @@ location ~ /es/alarm/(create|list|delete|update|stop|restart|scheduler/history|\
   proxy_pass      http://10.3.20.53:5009;
 }
 ```
+
+v0.1.060200
+
+omega-es.yaml添加配置文件项
+
+`appurl:"localhost:8000"`
+
+值为app的访问地址端口，后面不加斜杠，具体配置位置可参考omega-es.yaml

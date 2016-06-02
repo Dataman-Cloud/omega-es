@@ -2,6 +2,7 @@ host: "0.0.0.0"
 port: 5009
 murl: "APIURL/emails"
 userurl: "APIURL/clusters"
+appurl: "http://localhost:8000"
 log:
     console: true
     appendfile: false
