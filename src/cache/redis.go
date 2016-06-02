@@ -3,7 +3,6 @@ package cache
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/Dataman-Cloud/omega-es/src/model"
 	"github.com/Dataman-Cloud/omega-es/src/util"
 	"github.com/garyburd/redigo/redis"
@@ -153,7 +152,6 @@ func AppShrink(appid int64, min64 uint64) (error, uint64) {
 	if err != nil {
 		return err, 0
 	}
-	fmt.Println("++++++++:", m, min64)
 	if m <= min64 {
 		return errors.New("Have reached a minimum value"), 0
 	}
