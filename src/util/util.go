@@ -127,7 +127,7 @@ func AppScaling(body string, uid, clusterid, appid int64) error {
 	token := CronTokenBuilder(fmt.Sprintf("%d", uid))
 	log.Debug("-----:", url, body, token, uid)
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", token)
+	req.Header.Set(InternalTokenKey, token)
 	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
 	client := &http.Client{}
 	if _, err = client.Do(req); err != nil {
@@ -145,7 +145,7 @@ func GetUserType(uid, clusterid int64) (string, error) {
 	token := CronTokenBuilder(fmt.Sprintf("%d", uid))
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set(InternalTokenKey, token)
-	req.Header.Set("uid", fmt.Sprintf("%d", uid))
+	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
