@@ -27,7 +27,7 @@ type LogAlarm struct {
 	AppId      int64     `json:"appid"`
 	AppName    string    `json:"appname"`
 	AppAlias   string    `json:"appalias"`
-	Ival       int8      `json:"ival"`
+	Ival       int64     `json:"ival"`
 	GtNum      int64     `json:"gtnum"`
 	AlarmName  string    `json:"alarmname"`
 	UserType   string    `json:"usertype"`
@@ -47,7 +47,7 @@ type AlarmHistory struct {
 	IsAlarm   bool      `json:"isalarm"`
 	ExecTime  time.Time `json:"exectime"`
 	ResultNum int64     `json:"resultnum"`
-	Ival      int8      `json:"ival"`
+	Ival      int64     `json:"ival"`
 	GtNum     int64     `json:"gtnum"`
 	AppName   string    `json:"appname"`
 	KeyWord   string    `json:"keyword"`
@@ -67,7 +67,7 @@ type CronInfo struct {
 	KeyWord   string `json:"keyword"`
 	AppName   string `json:"appname"`
 	AppAlias  string `json:"appalias"`
-	Ival      int8   `json:"interval"`
+	Ival      int64  `json:"interval"`
 	UserType  string `json:"usertype"`
 	AlarmName string `json:"alarmname"`
 	Ipport    string `json:"ipport"`
