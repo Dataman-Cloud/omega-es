@@ -138,8 +138,8 @@ func CreateLogAlarm(c *echo.Context) error {
 		AliasName:  aliasname,
 		CreateTime: time.Now(),
 		Scaling:    scaling,
-		Maxs:       int8(maxs),
-		Mins:       int8(mins),
+		Maxs:       uint64(maxs),
+		Mins:       uint64(mins),
 		AppId:      int64(appid),
 	}
 
@@ -243,7 +243,6 @@ func DeleteLogAlarm(c *echo.Context) error {
 	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "delete alarm successful"})
 }
 
-//func JobExec(c *echo.Context) error {
 func JobExec(body []byte) error {
 	json, err := gabs.ParseJSON(body)
 	if err != nil {
@@ -292,7 +291,7 @@ func JobExec(body []byte) error {
 		log.Error("exec chronos job param can't get usertype")
 		return errors.New("exec chronos job param can't get usertype")
 	}
-	scaling, ok := json.Path("scaling").Data().(bool)
+	scaling, sok := json.Path("scaling").Data().(bool)
 	if !ok {
 		log.Error("exec chronos job param can't get scaling")
 	}
@@ -304,6 +303,12 @@ func JobExec(body []byte) error {
 	if !ok {
 		log.Error("exec chronos job param can't get mins")
 	}
+
+	appid, aok := json.Path("appid").Data().(float64)
+	if !ok {
+		log.Error("exec chronos job param can't get appid")
+	}
+
 	_, _, _ = scaling, maxs, mins
 
 	endtime := time.Now().Unix()
@@ -354,6 +359,7 @@ func JobExec(body []byte) error {
 	if len(bs) == 0 {
 		return nil
 	}
+	shrinkorextend := false
 	for _, b := range bs {
 		if int64(b.Path("doc_count").Data().(float64)) < alarm.GtNum {
 			break
@@ -375,6 +381,26 @@ func JobExec(body []byte) error {
 			IsAlarm:   true,
 		}
 		dao.AddAlaramHistory(alarmHistory)
+		if sok && scaling {
+			shrinkorextend = true
+		}
+	}
+	if shrinkorextend && aok {
+		if err = cache.AppExtend(int64(appid), uint64(maxs)); err == nil {
+			sbody := gabs.New()
+			sbody.Set("scale", "method")
+			sbody.Set(uint64(maxs), "instances")
+			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
+			log.Debugf("----add alarm scaling %v", err)
+		}
+	} else if !shrinkorextend && aok {
+		if err = cache.AppShrink(int64(appid), uint64(mins)); err == nil {
+			sbody := gabs.New()
+			sbody.Set("scale", "method")
+			sbody.Set(uint64(mins)-1, "instances")
+			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
+			log.Debugf("----add alarm scaling %v", err)
+		}
 	}
 	/*alarmHistory := &model.AlarmHistory{
 		JobId:     alarm.Id,
@@ -554,8 +580,8 @@ func UpdateLogAlarm(c *echo.Context) error {
 	alarm.KeyWord = keyword
 	alarm.Emails = emails
 	alarm.Scaling = scaling
-	alarm.Maxs = int8(maxs)
-	alarm.Mins = int8(mins)
+	alarm.Maxs = uint64(maxs)
+	alarm.Mins = uint64(mins)
 	if err = cache.UpdateAlarm(&alarm); err != nil {
 		log.Errorf("update alarm error")
 		return ReturnError(c, map[string]interface{}{"code": 17015, "data": "update alarm error"})

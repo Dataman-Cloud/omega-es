@@ -37,8 +37,8 @@ type LogAlarm struct {
 	CreateTime time.Time `json:"createtime"`
 	Isnotice   bool      `json:"isnotice"`
 	Scaling    bool      `json:"scaling"`
-	Maxs       int8      `json:"maxs"`
-	Mins       int8      `json:"mins"`
+	Maxs       uint64    `json:"maxs"`
+	Mins       uint64    `json:"mins"`
 }
 
 type AlarmHistory struct {
@@ -54,8 +54,8 @@ type AlarmHistory struct {
 	Uid       int64     `json:"uid"`
 	Cid       int64     `json:"cid"`
 	Scaling   bool      `json:"scaling"`
-	Maxs      int8      `json:"maxs"`
-	Mins      int8      `json:"mins"`
+	Maxs      uint64    `json:"maxs"`
+	Mins      uint64    `json:"mins"`
 	Ipport    string    `json:"ipport"`
 }
 

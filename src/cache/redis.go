@@ -2,6 +2,7 @@ package cache
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/Dataman-Cloud/omega-es/src/model"
 	"github.com/Dataman-Cloud/omega-es/src/util"
 	"github.com/garyburd/redigo/redis"
@@ -9,10 +10,11 @@ import (
 )
 
 const (
-	alarmindex  = "alarm:set"
-	alarminfo   = "alarm:info"
-	alarmhost   = "alarm:host"
-	alarmschedu = "alarm:schedu"
+	alarmindex   = "alarm:set"
+	alarminfo    = "alarm:info"
+	alarmhost    = "alarm:host"
+	alarmschedu  = "alarm:schedu"
+	alarmscaling = "alarm:scaling"
 )
 
 func AddAlarm(id int64, info []byte) error {
@@ -127,4 +129,32 @@ func UpdateScheduTime(id int64) {
 	conn := util.Open()
 	defer conn.Close()
 	conn.Do("HSET", alarmschedu, id, time.Now().Unix())
+}
+
+func AppExtend(appid int64, maxs uint64) error {
+	conn := util.Open()
+	defer conn.Close()
+	m, err := redis.Uint64(conn.Do("HGET", alarmscaling, appid))
+	if err == nil {
+		return err
+	}
+	if m == maxs {
+		return errors.New("Have reached the maximum")
+	}
+	_, err = conn.Do("HSET", alarmscaling, appid, maxs)
+	return err
+}
+
+func AppShrink(appid int64, min64 uint64) error {
+	conn := util.Open()
+	defer conn.Close()
+	m, err := redis.Uint64(conn.Do("HGET", alarmscaling, appid))
+	if err != nil {
+		return err
+	}
+	if m <= min64 {
+		return errors.New("Have reached a minimum value")
+	}
+	_, err = conn.Do("HSET", alarmscaling, appid, m-1)
+	return err
 }

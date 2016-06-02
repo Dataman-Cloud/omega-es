@@ -11,6 +11,7 @@ type Config struct {
 	Port    uint16
 	Murl    string
 	Userurl string
+	Appurl  string
 	Lc      LogConfig       `mapstructure:"log"`
 	Ec      EsConfig        `mapstructure:"es"`
 	Rc      RedisConfig     `mapstructure:"redis"`
