@@ -129,7 +129,7 @@ func CreateLogAlarm(c *echo.Context) error {
 		Cid:        int64(clusterid),
 		AppAlias:   appalias,
 		AppName:    appname,
-		Ival:       int8(interval),
+		Ival:       int64(interval),
 		GtNum:      int64(gtnum),
 		AlarmName:  alarmname,
 		UserType:   usertype,
@@ -518,7 +518,7 @@ func UpdateLogAlarm(c *echo.Context) error {
 		log.Error("update log alarm param can't get interval")
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get interval"})
 	}
-	if int8(interval) <= 0 {
+	if int64(interval) <= 0 {
 		log.Error("update log alarm interval must be greater than 0")
 		return ReturnError(c, map[string]interface{}{"code": 170015, "data": "update log alarm interval must be greater than 0"})
 	}
@@ -529,7 +529,7 @@ func UpdateLogAlarm(c *echo.Context) error {
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get gtnum"})
 	}
 
-	if int8(gtnum) <= 0 {
+	if int64(gtnum) <= 0 {
 		log.Error("update log alarm gtnum must be greater than 0")
 		return ReturnError(c, map[string]interface{}{"code": 170015, "data": "update log alarm gtnum must be greater than 0"})
 	}
@@ -574,7 +574,7 @@ func UpdateLogAlarm(c *echo.Context) error {
 	alarm.Cid = int64(clusterid)
 	alarm.AppAlias = appalias
 	alarm.AppName = appname
-	alarm.Ival = int8(interval)
+	alarm.Ival = int64(interval)
 	alarm.GtNum = int64(gtnum)
 	alarm.UserType = usertype
 	alarm.KeyWord = keyword
