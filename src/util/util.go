@@ -120,12 +120,12 @@ func SendEmail(body string) error {
 
 func AppScaling(body string, uid, clusterid, appid int64) error {
 	url := fmt.Sprintf("%s/api/v3/clusters/%d/apps/%d", config.GetConfig().Appurl, clusterid, appid)
-	log.Debug("-----:", url, body, token)
 	req, err := http.NewRequest("PATCH", url, strings.NewReader(body))
 	if err != nil {
 		return err
 	}
 	token := CronTokenBuilder(fmt.Sprintf("%d", uid))
+	log.Debug("-----:", url, body, token)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", token)
 	client := &http.Client{}
