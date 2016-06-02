@@ -120,7 +120,7 @@ func SendEmail(body string) error {
 
 func AppScaling(body string, uid, clusterid, appid int64) error {
 	url := fmt.Sprintf("%s/api/v3/clusters/%d/apps/%d", config.GetConfig().Appurl, clusterid, appid)
-	log.Debug("-----:", url)
+	log.Debug("-----:", url, body)
 	req, err := http.NewRequest("PATCH", url, strings.NewReader(body))
 	if err != nil {
 		return err
