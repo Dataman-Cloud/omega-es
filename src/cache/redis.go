@@ -145,16 +145,16 @@ func AppExtend(appid int64, maxs uint64) error {
 	return err
 }
 
-func AppShrink(appid int64, min64 uint64) error {
+func AppShrink(appid int64, min64 uint64) (error, uint64) {
 	conn := util.Open()
 	defer conn.Close()
 	m, err := redis.Uint64(conn.Do("HGET", alarmscaling, appid))
 	if err != nil {
-		return err
+		return err, 0
 	}
 	if m <= min64 {
-		return errors.New("Have reached a minimum value")
+		return errors.New("Have reached a minimum value"), 0
 	}
 	_, err = conn.Do("HSET", alarmscaling, appid, m-1)
-	return err
+	return err, m - 1
 }
