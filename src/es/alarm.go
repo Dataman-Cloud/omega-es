@@ -391,7 +391,7 @@ func JobExec(body []byte) error {
 			sbody.Set("scale", "method")
 			sbody.Set(uint64(maxs), "instances")
 			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
-			log.Debugf("----add alarm scaling %v", err)
+			log.Debugf("----add alarm scaling extend %v", err)
 		}
 	} else if !shrinkorextend && aok {
 		if err = cache.AppShrink(int64(appid), uint64(mins)); err == nil {
@@ -399,7 +399,7 @@ func JobExec(body []byte) error {
 			sbody.Set("scale", "method")
 			sbody.Set(uint64(mins)-1, "instances")
 			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
-			log.Debugf("----add alarm scaling %v", err)
+			log.Debugf("----add alarm scaling shrink %v", err)
 		}
 	}
 	/*alarmHistory := &model.AlarmHistory{
