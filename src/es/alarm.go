@@ -394,10 +394,10 @@ func JobExec(body []byte) error {
 			log.Debugf("----add alarm scaling extend %v", err)
 		}
 	} else if !shrinkorextend && aok {
-		if err = cache.AppShrink(int64(appid), uint64(mins)); err == nil {
+		if err, ms := cache.AppShrink(int64(appid), uint64(mins)); err == nil {
 			sbody := gabs.New()
 			sbody.Set("scale", "method")
-			sbody.Set(uint64(mins)-1, "instances")
+			sbody.Set(ms, "instances")
 			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
 			log.Debugf("----add alarm scaling shrink %v", err)
 		}
