@@ -27,13 +27,29 @@ func initEcho() {
 
 	//e.Use(CrossDomain)
 
-	es := e.Group("/es", auth)
+	es := e.Group("/api/v3", auth)
+	{
+		es.Post("/es/index", SearchIndex)
+		es.Post("/es/context", SearchContext)
+
+		es.Post("/alarm", CreateLogAlarm)
+		es.Put("/alarm", UpdateLogAlarm)
+		es.Delete("/alarm/:id", DeleteLogAlarm)
+		es.Patch("/alarm/:id", StopLogAlarm)
+		//ea.Put("/alarm/restart/:id", RestartLogAlarm)
+
+		es.Get("/alarm/:id", GetLogAlarm)
+		es.Get("/alarm", GetAlarms)
+		es.Get("/alarm/scheduler", GetAlarmHistory)
+	}
+
+	/*es := e.Group("/api/v3/es", auth)
 	{
 		es.Post("/index", SearchIndex)
 		es.Post("/context", SearchContext)
 	}
 
-	ea := e.Group("/es/alarm", auth)
+	ea := e.Group("/api/v3/alarm", auth)
 	{
 		ea.Post("/create", CreateLogAlarm)
 		ea.Put("/update", UpdateLogAlarm)
@@ -43,18 +59,21 @@ func initEcho() {
 		ea.Get("/:id", GetLogAlarm)
 		ea.Get("/list", GetAlarms)
 		ea.Get("/scheduler/history", GetAlarmHistory)
-	}
+	}*/
 
-	ed := e.Group("/es/download")
+	/*ed := e.Group("/api/v3/es/download")
 	{
-		ed.Get("/index/log", ExportIndex)
-		ed.Get("/context/log", ExportContext)
-	}
+		ed.Get("/index", ExportIndex)
+		ed.Get("/context", ExportContext)
+	}*/
+	e.Get("/api/v3/es/download/index", ExportIndex)
+	e.Get("/api/v3/es/download/context", ExportContext)
+	e.Get("/api/v3/health/log", Health)
 
-	api := e.Group("/api/v3")
+	/*api := e.Group("/api/v3")
 	{
 		api.Get("/health/log", Health)
-	}
+	}*/
 
 	log.Info("listening server address: ", addr)
 	s := &http.Server{

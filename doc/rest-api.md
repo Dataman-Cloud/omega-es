@@ -4,10 +4,10 @@
  * [POST /search/jump](#searchjump): 根据一条日志查询日志上下文
 
 ##Search
-####POST `/es/index`
+####POST `/api/v3/es/index`
 日志首页根据选择条件查询
 ```shell
-curl -X POST http://123.59.58.58:8080/es/index \
+curl -X POST http://123.59.58.58:8080/api/v3/es/index \
         -H Authorization:usertoken \
         -H Content-Type:application/json -d '{
     "userid": 1,
@@ -22,9 +22,9 @@ curl -X POST http://123.59.58.58:8080/es/index \
     "source": "echo"
 }'
 ```
-####POST `/es/content`
+####POST `/api/v3/es/context`
 ```shell
-curl -X POST http://123.59.58.58:8080/es/content \
+curl -X POST http://123.59.58.58:8080/api/v3/es/context \
         -H Authorization:usertoken \
         -H Content-Type:application/json -d '{
     "userid": 1,
@@ -36,9 +36,9 @@ curl -X POST http://123.59.58.58:8080/es/content \
     "source": "echo"
 }'
 ```
-####POST `/es/index/download`
+####POST `/api/v3/es/download/index`
 ```shell
-curl -X POST http://10.3.11.22:9200/es/index/download \
+curl -X POST http://10.3.11.22:9200/api/v3/es/download/index \
         -H Authorization:usertoken \
         -H Content-Type:application/json -d '{
     "userid": 1,
@@ -51,9 +51,9 @@ curl -X POST http://10.3.11.22:9200/es/index/download \
     "source": "echo"
 }'
 ```
-####POST `/es/content/download`
+####POST `/api/v3/es/download/context`
 ```shell
-curl -X POST http://123.59.58.58:8080/es/content/download \
+curl -X POST http://123.59.58.58:8080/api/v3/es/download/context \
         -H Authorization:usertoken \
         -H Content-Type:application/json -d '{
     "userid": 1,
@@ -66,10 +66,10 @@ curl -X POST http://123.59.58.58:8080/es/content/download \
 }'
 ```
 
-####POST `/es/alarm/create`
+####POST `/api/v3/alarm`
 创建报警策略
 ```shell
-curl -X POST http://10.3.20.53:5009/es/alarm/create \
+curl -X POST http://10.3.20.53:5009/api/v3/alarm \
 	-H Authorization:usertoken \
 	-H Content-Type:application/json -d '{
     "userid": 1,
@@ -87,10 +87,10 @@ curl -X POST http://10.3.20.53:5009/es/alarm/create \
 }'
 ```
 
-####PUT `/es/alarm/update`
+####PUT `/api/v3/alarm`
 更新报警策略
 ```shell
-curl -X PUT http://10.3.20.53:5009/es/alarm/update \
+curl -X PUT http://10.3.20.53:5009/api/v3/alarm \
 	-H Authorization:usertoken \
 	-H Content-Type:application/json -d '{
     "id":1,
@@ -108,26 +108,22 @@ curl -X PUT http://10.3.20.53:5009/es/alarm/update \
     "maxs": 2
 }'
 ```
-####GET `/es/alarm/:id`
+####GET `/api/v3/alarm/:id`
 获取策略详细信息
-`curl -X -H Authorization:usertoken GET http://10.3.20.53:5009/es/alarm/:id`
+`curl -X -H Authorization:usertoken GET http://10.3.20.53:5009/api/v3/alarm/:id`
 
-####PUT `/es/alarm/stop/:id`
-停止策略
-`curl -X -H Authorization:usertoken PUT http://10.3.20.53:5009/es/alarm/stop/:id`
+####PATCH `/api/v3/alarm/:id`
+停止策略或重启mesthod有两个值 一个是stop 一个是restart
+`curl -X -H Authorization:usertoken PATCH http://10.3.20.53:5009/api/v3/alarm/:id -d '{"method":"stop"}'`
 
-####PUT `/es/alarm/restart/:id`
-重启策略
-`curl -X -H Authorization:usertoken PUT http://10.3.20.53:5009/es/alarm/restart/:id`
-
-####DELETE `/es/alarm/delete/:id`
+####DELETE `/api/v3/alarm/:id`
 删除报警策略
-`curl -X -H Authorization:usertoken DELETE http://10.3.20.53:5009/es/alarm/delete/:id`
+`curl -X -H Authorization:usertoken DELETE http://10.3.20.53:5009/api/v3/alarm/:id`
 
-####GET `/es/alarm/list?usertype=usertype&uid=uid&pcount=pcount&pnum=pnum`
+####GET `/api/v3/alarm?usertype=usertype&uid=uid&pcount=pcount&pnum=pnum`
 查看创建策略列表
-`curl -X -H Authorization:usertoken GET http://10.3.20.53:5009/es/alarm/list?usertype=usertype&uid=uidpcount=pcount&pnum=pnum`
+`curl -X -H Authorization:usertoken GET http://10.3.20.53:5009/api/v3/alarm?usertype=usertype&uid=uidpcount=pcount&pnum=pnum`
 
-####GET `/es/alarm/scheduler/history?jobid=jobid&pcount=pcount&pnum=pnum`
+####GET `/api/v3/alarm/scheduler?jobid=jobid&pcount=pcount&pnum=pnum`
 查看策略执行历史记录
-`curl  -X -H Authorization:usertoken GET http://10.3.20.53:5009/es/alarm/scheduler/history?id=id&pcount=pcount&pnum=pnum`
+`curl  -X -H Authorization:usertoken GET http://10.3.20.53:5009/api/v3/alarm/scheduler?id=id&pcount=pcount&pnum=pnum`
