@@ -391,7 +391,7 @@ func JobExec(body []byte) error {
 			sbody := gabs.New()
 			sbody.Set("scale", "method")
 			sbody.Set(uint64(maxs), "instances")
-			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
+			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid), alarm.Id)
 			log.Debugf("----add alarm scaling extend %v", err)
 		}
 		/*if err = cache.AppExtend(int64(appid), uint64(maxs)); err == nil {
@@ -406,7 +406,7 @@ func JobExec(body []byte) error {
 			sbody := gabs.New()
 			sbody.Set("scale", "method")
 			sbody.Set(instances-1, "instances")
-			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
+			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid), alarm.Id)
 			log.Debugf("----add alarm scaling shrink %v", err)
 		}
 		/*if err, ms := cache.AppShrink(int64(appid), uint64(mins)); err == nil {

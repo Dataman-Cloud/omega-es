@@ -20,6 +20,7 @@ import (
 const (
 	EmailDefalutUser = "1"
 	InternalTokenKey = "Sry-Svc-Token"
+	LOG_ALARM_ID     = "Log-Alarm-Id"
 )
 
 func ReadBody(c *echo.Context) ([]byte, error) {
@@ -118,7 +119,7 @@ func SendEmail(body string) error {
 	return nil
 }
 
-func AppScaling(body string, uid, clusterid, appid int64) error {
+func AppScaling(body string, uid, clusterid, appid, alarmid int64) error {
 	url := fmt.Sprintf("%s/api/v3/clusters/%d/apps/%d", config.GetConfig().Appurl, clusterid, appid)
 	req, err := http.NewRequest("PATCH", url, strings.NewReader(body))
 	if err != nil {
@@ -129,6 +130,7 @@ func AppScaling(body string, uid, clusterid, appid int64) error {
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set(InternalTokenKey, token)
 	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
+	req.Header.Set(LOG_ALARM_ID, fmt.Sprintf("%d", alarmid))
 	client := &http.Client{}
 	if _, err = client.Do(req); err != nil {
 		return err
