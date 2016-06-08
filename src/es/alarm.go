@@ -386,21 +386,36 @@ func JobExec(body []byte) error {
 		}
 	}
 	if shrinkorextend && aok {
-		if err = cache.AppExtend(int64(appid), uint64(maxs)); err == nil {
+		instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid))
+		if err == nil && instances != int64(maxs) {
 			sbody := gabs.New()
 			sbody.Set("scale", "method")
 			sbody.Set(uint64(maxs), "instances")
 			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
 			log.Debugf("----add alarm scaling extend %v", err)
 		}
+		/*if err = cache.AppExtend(int64(appid), uint64(maxs)); err == nil {
+			sbody := gabs.New()
+			sbody.Set("scale", "method")
+			sbody.Set(uint64(maxs), "instances")
+			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
+			log.Debugf("----add alarm scaling extend %v", err)
+		}*/
 	} else if !shrinkorextend && aok {
-		if err, ms := cache.AppShrink(int64(appid), uint64(mins)); err == nil {
+		if instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid)); err == nil && instances > int64(mins) && instances > 0 {
+			sbody := gabs.New()
+			sbody.Set("scale", "method")
+			sbody.Set(instances-1, "instances")
+			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
+			log.Debugf("----add alarm scaling shrink %v", err)
+		}
+		/*if err, ms := cache.AppShrink(int64(appid), uint64(mins)); err == nil {
 			sbody := gabs.New()
 			sbody.Set("scale", "method")
 			sbody.Set(ms, "instances")
 			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
 			log.Debugf("----add alarm scaling shrink %v", err)
-		}
+		}*/
 	}
 	/*alarmHistory := &model.AlarmHistory{
 		JobId:     alarm.Id,
@@ -605,6 +620,21 @@ func UpdateLogAlarm(c *echo.Context) error {
 }
 
 func StopLogAlarm(c *echo.Context) error {
+	body, err := ReadBody(c)
+	if err != nil {
+		log.Error("operation alarm can't get request body error: ", err)
+		return ReturnError(c, map[string]interface{}{"code": 17001, "data": "operation log alarm can't get request body"})
+	}
+	json, err := gabs.ParseJSON(body)
+	if err != nil {
+		log.Error("operation log alarm request parse to json error: ", err)
+		return ReturnError(c, map[string]interface{}{"code": 17002, "data": "operation log alarm request parse to json error"})
+	}
+	method, ok := json.Path("method").Data().(string)
+	if !ok {
+		log.Errorf("log alarm illegal request")
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "log alarm illegal request"})
+	}
 	id := c.Param("id")
 	jobid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -616,20 +646,43 @@ func StopLogAlarm(c *echo.Context) error {
 		log.Errorf("stop log alarm get alarm by id error: %v", id)
 		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop log alarm get alarm by id error"})
 	}
-	if !alarm.Isnotice {
-		return ReturnOK(c, map[string]interface{}{"code": 0, "data": "alarm is already stop"})
+	if method == "stop" {
+		if !alarm.Isnotice {
+			return ReturnOK(c, map[string]interface{}{"code": 0, "data": "alarm is already stop"})
+		}
+		alarm.Isnotice = false
+		if err = cache.DeleteAlarm(alarm.Id); err != nil {
+			log.Error("stop alarm error")
+			return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop alarm error"})
+		}
+		err = dao.UpdateAlarmStatus(&alarm)
+		if err != nil {
+			log.Errorf("stop log alarm update alarm status error: %v", err)
+			return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop log alarm update alarm status error"})
+		}
+		//return ReturnOK(c, map[string]interface{}{"code": 0, "data": "stop alarm successful"})
+	} else if method == "restart" {
+		alarm.Isnotice = true
+		err = dao.UpdateAlarmStatus(&alarm)
+		if err != nil {
+			log.Errorf("restart log alarm update alarm status error: %v", err)
+			return ReturnError(c, map[string]interface{}{"code": 17016, "data": "restart log alarm update alarm status error"})
+		}
+		abody, err := enjson.Marshal(alarm)
+		if err != nil {
+			log.Errorf("restart log alarm asearch parse to json string error: %v", err)
+			return ReturnError(c, map[string]interface{}{"code": 17007, "data": "restart log alarm asearch parse to json string error: " + err.Error()})
+		}
+		if err = cache.AddAlarm(alarm.Id, abody); err != nil {
+			log.Errorf("restart alarm error")
+			return ReturnError(c, map[string]interface{}{"code": 17016, "data": "restart alarm error"})
+		}
+
+		//return ReturnOK(c, map[string]interface{}{"code": 0, "data": "restart log alarm successful"})
+	} else {
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "illegality operation"})
 	}
-	alarm.Isnotice = false
-	if err = cache.DeleteAlarm(alarm.Id); err != nil {
-		log.Error("stop alarm error")
-		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop alarm error"})
-	}
-	err = dao.UpdateAlarmStatus(&alarm)
-	if err != nil {
-		log.Errorf("stop log alarm update alarm status error: %v", err)
-		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop log alarm update alarm status error"})
-	}
-	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "stop alarm successful"})
+	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "operation alarm successful"})
 }
 
 func RestartLogAlarm(c *echo.Context) error {

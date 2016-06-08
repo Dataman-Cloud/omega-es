@@ -125,7 +125,7 @@ func AppScaling(body string, uid, clusterid, appid int64) error {
 		return err
 	}
 	token := CronTokenBuilder(fmt.Sprintf("%d", uid))
-	log.Debug("-----:", url, body, token, uid)
+	log.Debug("call app scaling:", url, body, token, uid)
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set(InternalTokenKey, token)
 	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
@@ -134,6 +134,34 @@ func AppScaling(body string, uid, clusterid, appid int64) error {
 		return err
 	}
 	return nil
+}
+
+func GetInstance(uid, clusterid, appid int64) (int64, error) {
+	url := fmt.Sprintf("%s/api/v3/clusters/%d/apps/%d", config.GetConfig().Appurl, clusterid, appid)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return 0, err
+	}
+	token := CronTokenBuilder(fmt.Sprintf("%d", uid))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(InternalTokenKey, token)
+	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
+	client := &http.Client{}
+	if resp, err := client.Do(req); err != nil {
+		return 0, err
+	} else {
+		body, err := ReadResponseBody(resp.Body)
+		if err != nil {
+			return 0, err
+		}
+		jsonp, err := gabs.ParseJSON(body)
+		if err != nil {
+			return 0, err
+		}
+		return int64(jsonp.Path("data.instances").Data().(float64)), nil
+
+	}
+	return 0, nil
 }
 
 func GetUserType(uid, clusterid int64) (string, error) {

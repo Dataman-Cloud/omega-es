@@ -1,6 +1,7 @@
 package es
 
 import (
+	"fmt"
 	"github.com/Dataman-Cloud/omega-es/src/dao"
 	. "github.com/Dataman-Cloud/omega-es/src/util"
 	"github.com/Jeffail/gabs"
@@ -76,11 +77,17 @@ func SearchIndex(c *echo.Context) error {
 		return ReturnError(c, map[string]string{"error": "searchindex param parse json error"})
 	}
 
-	userid, ok := json.Path("userid").Data().(float64)
+	uid := c.Get("uid").(string)
+	userid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		log.Error("serachindex invalid token")
+		return ReturnError(c, map[string]string{"error": "searchindex inavlid token"})
+	}
+	/*userid, ok := json.Path("userid").Data().(float64)
 	if !ok {
 		log.Error("searchindex param can't found userid")
 		return ReturnError(c, map[string]string{"error": "searchindex can't found userid"})
-	}
+	}*/
 
 	clusterid, ok := json.Path("clusterid").Data().(float64)
 	if !ok {
@@ -200,7 +207,7 @@ func SearchIndex(c *echo.Context) error {
 		  "fragment_size": -1
 		}
 	       }`
-	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-"
+	esindex := "logstash-*" + fmt.Sprintf("%d", userid) + "-"
 	estype := ""
 	if start[:10] == end[:10] {
 		esindex += start[:10]
@@ -257,11 +264,17 @@ func SearchContext(c *echo.Context) error {
 		return ReturnError(c, map[string]string{"error": "searchcontext param parse json error"})
 	}
 
-	userid, ok := json.Path("userid").Data().(float64)
+	uid := c.Get("uid").(string)
+	userid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		log.Error("serachcontext invalid token")
+		return ReturnError(c, map[string]string{"error": "searchcontext inavlid token"})
+	}
+	/*userid, ok := json.Path("userid").Data().(float64)
 	if !ok {
 		log.Error("searchcontext param can't found userid")
 		return ReturnError(c, map[string]string{"error": "searchcontext can't found userid"})
-	}
+	}*/
 
 	clusterid, ok := json.Path("clusterid").Data().(float64)
 	if !ok {
@@ -353,7 +366,7 @@ func SearchContext(c *echo.Context) error {
 		      "fragment_size": -1
 	            }
 		  }`
-	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + timestamp[:10]
+	esindex := "logstash-*" + fmt.Sprintf("%d", userid) + "-" + timestamp[:10]
 	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	estype := ""
 	esindex = "*"
