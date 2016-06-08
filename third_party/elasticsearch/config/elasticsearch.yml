@@ -59,7 +59,8 @@ network.host: 0.0.0.0
 
 # Set a custom port for HTTP:
 #
-# http.port: 9200
+http.port: ${HTTPPORT}
+transport.tcp.port: ${TRANSPORT}
 #
 # For more information, see the documentation at:
 # <http://www.elastic.co/guide/en/elasticsearch/reference/current/modules-network.html>
@@ -81,7 +82,7 @@ network.host: 0.0.0.0
 # Pass an initial list of hosts to perform discovery when new node is started:
 # The default list of hosts is ["127.0.0.1", "[::1]"]
 discovery.zen.ping.multicast.enabled: false
-#discovery.zen.ping.unicast.hosts: ["10.3.20.54"]
+discovery.zen.ping.unicast.hosts: ${NODES}
 #
 # Prevent the "split brain" by configuring the majority of nodes (total number of nodes / 2 + 1):
 #
