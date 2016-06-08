@@ -19,7 +19,7 @@ func Health(c *echo.Context) error {
 	ma := map[string]interface{}{
 		"status": 0,
 	}
-	start := time.Now().Unix()
+	start := time.Now().UnixNano()
 	_, err := Conn.AllNodesInfo()
 	mes := make(map[string]interface{})
 	if err == nil {
@@ -29,7 +29,7 @@ func Health(c *echo.Context) error {
 		ma["status"] = 1
 	}
 	end := time.Now().UnixNano()
-	mes["time"] = end - start
+	mes["time"] = (end - start) / 1000000
 
 	mall := map[string]interface{}{
 		"elasticsearch": mes,
@@ -46,21 +46,21 @@ func Health(c *echo.Context) error {
 		mredis["status"] = 1
 		ma["status"] = 1
 	}
-	end = time.Now().Unix()
-	mredis["time"] = end - start
+	end = time.Now().UnixNano()
+	mredis["time"] = (end - start) / 1000000
 	mall["redis"] = mredis
-	aend := time.Now().Unix()
-	ma["time"] = aend - astart
+	aend := time.Now().UnixNano()
+	ma["time"] = (aend - astart) / 1000000
 	mall["omegaEs"] = ma
 
 	mmsql := make(map[string]interface{})
-	mysqlstart := time.Now().Unix()
+	mysqlstart := time.Now().UnixNano()
 	if err = dao.Ping(); err == nil {
 		mmsql["status"] = 0
 	} else {
 		mmsql["status"] = 1
 	}
-	mmsql["time"] = time.Now().Unix() - mysqlstart
+	mmsql["time"] = (time.Now().UnixNano() - mysqlstart) / 1000000
 	mall["mysql"] = mmsql
 	return c.JSON(http.StatusOK, mall)
 }
