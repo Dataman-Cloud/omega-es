@@ -33,3 +33,15 @@ omega-es.yaml添加配置文件项
 `appurl:"localhost:8000"`
 
 值为app的访问地址端口，后面不加斜杠，具体配置位置可参考omega-es.yaml
+
+##0608001
+
+修改nginx配置文件
+
+1. 把`location ~ ^/es/(index|context|download) {`   修改为
+`location ~ /api/v3/es/(index|context|download) {`
+
+2. 把`location ~ /es/alarm/(create|list|delete|update|stop|restart|scheduler/history|\d) {` 修改为
+`location ~ /api/v3/alarm {`
+
+
