@@ -156,7 +156,6 @@ func CreateLogAlarm(c *echo.Context) error {
 		return ReturnError(c, map[string]interface{}{"code": 17007, "data": "create log alarm asearch parse to json string error: " + err.Error()})
 	}
 
-	log.Debug("-----add alarm json: ", string(abody))
 	err = cache.AddAlarm(alarm.Id, abody)
 	if err != nil {
 		return ReturnError(c, map[string]interface{}{"code": 17006, "data": "add cron job error"})
@@ -250,7 +249,7 @@ func JobExec(body []byte) error {
 		log.Error("exec chronos job request parse to json error: ", err)
 		return err
 	}
-
+	log.Debug("get json body: ", string(body))
 	userid, ok := json.Path("uid").Data().(float64)
 	if !ok {
 		log.Error("exec chronos job param can't get userid")
@@ -310,16 +309,8 @@ func JobExec(body []byte) error {
 		log.Error("exec chronos job param can't get appid")
 	}
 
-	_, _, _ = scaling, maxs, mins
-
 	endtime := time.Now().Unix()
 	starttime := endtime - int64(interval)*60
-	/*query := `{"query":{"bool":{"must":[{"term":{"clusterid":"` + strconv.Itoa(int(clusterid)) + `"}},`
-	if ipport, ok := json.Path("ipport").Data().(string); ok {
-		query = query + `{"terms":{"ipport":["` + strings.Replace(ipport, ",", "\",\"", -1) + `"],"minimum_match":1}}`
-	}
-	query = query + `{"match":{"msg":{"query":"` + keyword +
-		`","analyzer":"ik"}}},{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) + `","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}`*/
 	query := `{"size":0,"query":{"filtered":{"query":{"bool":{"must":[{"term":{"clusterid":` + fmt.Sprintf("%d", int64(clusterid)) + `}},` +
 		`{"term":{"typename":"` + appalias + `"}},{"match":{"msg":{"query":"` + keyword + `","analyzer":"ik"}}}]}},` +
 		`"filter":{"bool":{"must":[{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) +
