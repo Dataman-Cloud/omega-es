@@ -241,8 +241,6 @@ func SearchIndex(c *echo.Context) error {
 					msg = strings.Replace(msg, " ", "&nbsp;", -1)*/
 					msg = ReplaceHtml(msg)
 					hits[i].Path("fields.msg").SetIndex(msg, 0)
-				} else {
-					continue
 				}
 				msgh, err := hit.Path("highlight.msg").Children()
 				if err == nil {
@@ -252,9 +250,8 @@ func SearchIndex(c *echo.Context) error {
 					msg = ReplaceHtml(msg)
 					msg = strings.Replace(msg, "-emstart-", "<em style=\"color:red;\">", -1)
 					msg = strings.Replace(msg, "-emend-", "</em>", -1)
+					hits[i].Path("highlight.msg").SetIndex(msg, 0)
 					log.Debug("------:", msg)
-				} else {
-					continue
 				}
 			}
 		}
@@ -408,8 +405,17 @@ func SearchContext(c *echo.Context) error {
 					msg = strings.Replace(msg, " ", "&nbsp;", -1)*/
 					msg = ReplaceHtml(msg)
 					hits[i].Path("fields.msg").SetIndex(msg, 0)
-				} else {
-					continue
+				}
+				msgh, err := hit.Path("highlight.msg").Children()
+				if err == nil {
+					msg := msgh[0].Data().(string)
+					msg = strings.Replace(msg, "<em style=\"color:red;\">", "-emstart-", -1)
+					msg = strings.Replace(msg, "</em>", "-emend-", -1)
+					msg = ReplaceHtml(msg)
+					msg = strings.Replace(msg, "-emstart-", "<em style=\"color:red;\">", -1)
+					msg = strings.Replace(msg, "-emend-", "</em>", -1)
+					hits[i].Path("highlight.msg").SetIndex(msg, 0)
+					log.Debug("------:", msg)
 				}
 			}
 		}
