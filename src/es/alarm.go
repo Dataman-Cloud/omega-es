@@ -376,9 +376,9 @@ func JobExec(body []byte) error {
 			shrinkorextend = true
 		}
 	}
-	log.Debug("-------:", alarm.AppName, "---", shrinkorextend, "----", aok)
 	if shrinkorextend && aok {
 		instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid))
+		log.Debug("-------:", alarm.AppName, "---", err, "----", instances, "-----", int64(maxs))
 		if err == nil && instances != int64(maxs) {
 			sbody := gabs.New()
 			sbody.Set("scale", "method")
