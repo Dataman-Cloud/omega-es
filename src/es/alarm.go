@@ -351,8 +351,13 @@ func JobExec(body []byte) error {
 		return nil
 	}
 	shrinkorextend := false
+	sore := 0
 	for _, b := range bs {
 		if int64(b.Path("doc_count").Data().(float64)) < alarm.GtNum {
+			if sok && scaling {
+				shrinkorextend = true
+				sore = 2
+			}
 			break
 		}
 		alarmHistory := &model.AlarmHistory{
@@ -374,40 +379,29 @@ func JobExec(body []byte) error {
 		dao.AddAlaramHistory(alarmHistory)
 		if sok && scaling {
 			shrinkorextend = true
+			sore = 1
 		}
 	}
+	log.Debug("-------:", alarm.AppName, "---", shrinkorextend, aok)
 	if shrinkorextend && aok {
-		instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid))
-		log.Debug("-------:", alarm.AppName, "---", err, "----", instances, "-----", int64(maxs))
-		if err == nil && instances != int64(maxs) {
-			sbody := gabs.New()
-			sbody.Set("scale", "method")
-			sbody.Set(uint64(maxs), "instances")
-			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid), alarm.Id)
-			log.Debugf("----add alarm scaling extend %v", err)
+		if sore == 1 {
+			instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid))
+			if err == nil && instances != int64(maxs) {
+				sbody := gabs.New()
+				sbody.Set("scale", "method")
+				sbody.Set(uint64(maxs), "instances")
+				err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid), alarm.Id)
+				log.Debugf("----add alarm scaling extend %v", err)
+			}
+		} else if sore == 2 {
+			if instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid)); err == nil && instances > int64(mins) && instances > 0 {
+				sbody := gabs.New()
+				sbody.Set("scale", "method")
+				sbody.Set(instances-1, "instances")
+				err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid), alarm.Id)
+				log.Debugf("----add alarm scaling shrink %v", err)
+			}
 		}
-		/*if err = cache.AppExtend(int64(appid), uint64(maxs)); err == nil {
-			sbody := gabs.New()
-			sbody.Set("scale", "method")
-			sbody.Set(uint64(maxs), "instances")
-			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
-			log.Debugf("----add alarm scaling extend %v", err)
-		}*/
-	} else if !shrinkorextend && aok {
-		if instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid)); err == nil && instances > int64(mins) && instances > 0 {
-			sbody := gabs.New()
-			sbody.Set("scale", "method")
-			sbody.Set(instances-1, "instances")
-			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid), alarm.Id)
-			log.Debugf("----add alarm scaling shrink %v", err)
-		}
-		/*if err, ms := cache.AppShrink(int64(appid), uint64(mins)); err == nil {
-			sbody := gabs.New()
-			sbody.Set("scale", "method")
-			sbody.Set(ms, "instances")
-			err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid))
-			log.Debugf("----add alarm scaling shrink %v", err)
-		}*/
 	}
 	/*alarmHistory := &model.AlarmHistory{
 		JobId:     alarm.Id,
