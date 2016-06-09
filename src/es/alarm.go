@@ -18,6 +18,11 @@ import (
 	"time"
 )
 
+const (
+	EXPAND = 1
+	SHRINK = 2
+)
+
 func CreateLogAlarm(c *echo.Context) error {
 	body, err := ReadBody(c)
 	if err != nil {
@@ -356,7 +361,7 @@ func JobExec(body []byte) error {
 		if int64(b.Path("doc_count").Data().(float64)) < alarm.GtNum {
 			if sok && scaling {
 				shrinkorextend = true
-				sore = 2
+				sore = SHRINK
 			}
 			break
 		}
@@ -379,12 +384,12 @@ func JobExec(body []byte) error {
 		dao.AddAlaramHistory(alarmHistory)
 		if sok && scaling {
 			shrinkorextend = true
-			sore = 1
+			sore = EXPAND
 		}
 	}
 	log.Debug("-------:", alarm.AppName, "---", shrinkorextend, aok)
 	if shrinkorextend && aok {
-		if sore == 1 {
+		if sore == EXPAND {
 			instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid))
 			if err == nil && instances != int64(maxs) {
 				sbody := gabs.New()
@@ -393,7 +398,7 @@ func JobExec(body []byte) error {
 				err = AppScaling(sbody.String(), int64(userid), int64(clusterid), int64(appid), alarm.Id)
 				log.Debugf("----add alarm scaling extend %v", err)
 			}
-		} else if sore == 2 {
+		} else if sore == SHRINK {
 			if instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid)); err == nil && instances > int64(mins) && instances > 0 {
 				sbody := gabs.New()
 				sbody.Set("scale", "method")
