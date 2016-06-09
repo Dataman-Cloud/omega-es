@@ -247,7 +247,11 @@ func SearchIndex(c *echo.Context) error {
 				msgh, err := hit.Path("highlight.msg").Children()
 				if err == nil {
 					msg := msgh[0].Data().(string)
-					msg = strings.Replace(msg, "<em style=\"color:red;\">", "----------", -1)
+					msg = strings.Replace(msg, "<em style=\"color:red;\">", "-emstart-", -1)
+					msg = strings.Replace(msg, "</em>", "-emend-", -1)
+					msg = ReplaceHtml(msg)
+					msg = strings.Replace(msg, "-emstart-", "<em style=\"color:red;\">", -1)
+					msg = strings.Replace(msg, "-emend-", "</em>", -1)
 					log.Debug("------:", msg)
 				} else {
 					continue
