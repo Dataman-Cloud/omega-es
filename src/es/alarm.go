@@ -249,7 +249,6 @@ func JobExec(body []byte) error {
 		log.Error("exec chronos job request parse to json error: ", err)
 		return err
 	}
-	log.Debug("get json body: ", string(body))
 	userid, ok := json.Path("uid").Data().(float64)
 	if !ok {
 		log.Error("exec chronos job param can't get userid")
@@ -377,6 +376,7 @@ func JobExec(body []byte) error {
 			shrinkorextend = true
 		}
 	}
+	log.Debug("-------:", alarm.AppName, "---", shrinkorextend, "----", aok)
 	if shrinkorextend && aok {
 		instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid))
 		if err == nil && instances != int64(maxs) {
