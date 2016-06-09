@@ -358,33 +358,33 @@ func JobExec(body []byte) error {
 	//shrinkorextend := false
 	sore := SHRINK
 	for _, b := range bs {
-		if int64(b.Path("doc_count").Data().(float64)) < alarm.GtNum {
+		if int64(b.Path("doc_count").Data().(float64)) >= alarm.GtNum {
+			alarmHistory := &model.AlarmHistory{
+				JobId:     alarm.Id,
+				ExecTime:  time.Now(),
+				ResultNum: int64(b.Path("doc_count").Data().(float64)),
+				Uid:       int64(userid),
+				Cid:       int64(clusterid),
+				KeyWord:   keyword,
+				AppName:   alarm.AppName,
+				GtNum:     alarm.GtNum,
+				Ival:      alarm.Ival,
+				Ipport:    b.Path("key").Data().(string),
+				Scaling:   alarm.Scaling,
+				Maxs:      alarm.Maxs,
+				Mins:      alarm.Mins,
+				IsAlarm:   true,
+			}
+			dao.AddAlaramHistory(alarmHistory)
 			if sok && scaling {
 				//shrinkorextend = true
-				sore = SHRINK
+				sore = EXPAND
 			}
 			break
 		}
-		alarmHistory := &model.AlarmHistory{
-			JobId:     alarm.Id,
-			ExecTime:  time.Now(),
-			ResultNum: int64(b.Path("doc_count").Data().(float64)),
-			Uid:       int64(userid),
-			Cid:       int64(clusterid),
-			KeyWord:   keyword,
-			AppName:   alarm.AppName,
-			GtNum:     alarm.GtNum,
-			Ival:      alarm.Ival,
-			Ipport:    b.Path("key").Data().(string),
-			Scaling:   alarm.Scaling,
-			Maxs:      alarm.Maxs,
-			Mins:      alarm.Mins,
-			IsAlarm:   true,
-		}
-		dao.AddAlaramHistory(alarmHistory)
 		if sok && scaling {
 			//shrinkorextend = true
-			sore = EXPAND
+			sore = SHRINK
 		}
 	}
 	log.Debug("-------:", alarm.AppName, "---", sok, scaling, aok, sore)
