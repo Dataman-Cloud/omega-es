@@ -355,12 +355,12 @@ func JobExec(body []byte) error {
 	if len(bs) == 0 {
 		return nil
 	}
-	shrinkorextend := false
-	sore := 0
+	//shrinkorextend := false
+	sore := SHRINK
 	for _, b := range bs {
 		if int64(b.Path("doc_count").Data().(float64)) < alarm.GtNum {
 			if sok && scaling {
-				shrinkorextend = true
+				//shrinkorextend = true
 				sore = SHRINK
 			}
 			break
@@ -383,12 +383,12 @@ func JobExec(body []byte) error {
 		}
 		dao.AddAlaramHistory(alarmHistory)
 		if sok && scaling {
-			shrinkorextend = true
+			//shrinkorextend = true
 			sore = EXPAND
 		}
 	}
-	log.Debug("-------:", alarm.AppName, "---", shrinkorextend, aok, sore)
-	if shrinkorextend && aok {
+	log.Debug("-------:", alarm.AppName, "---", sok, scaling, aok, sore)
+	if sok && scaling && aok {
 		if sore == EXPAND {
 			instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid))
 			if err == nil && instances != int64(maxs) {
