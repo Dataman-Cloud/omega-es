@@ -352,9 +352,9 @@ func JobExec(body []byte) error {
 	}
 
 	cache.UpdateScheduTime(alarm.Id)
-	if len(bs) == 0 {
+	/*if len(bs) == 0 {
 		return nil
-	}
+	}*/
 	//shrinkorextend := false
 	sore := SHRINK
 	for _, b := range bs {
