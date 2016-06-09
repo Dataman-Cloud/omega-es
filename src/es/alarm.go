@@ -156,6 +156,7 @@ func CreateLogAlarm(c *echo.Context) error {
 		return ReturnError(c, map[string]interface{}{"code": 17007, "data": "create log alarm asearch parse to json string error: " + err.Error()})
 	}
 
+	log.Debug("-----add alarm json: ", string(abody))
 	err = cache.AddAlarm(alarm.Id, abody)
 	if err != nil {
 		return ReturnError(c, map[string]interface{}{"code": 17006, "data": "add cron job error"})
