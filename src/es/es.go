@@ -234,12 +234,21 @@ func SearchIndex(c *echo.Context) error {
 				msgs, err := hit.Path("fields.msg").Children()
 				if err == nil {
 					msg := msgs[0].Data().(string)
-					msg = strings.Replace(msg, "&", "&amp;", -1)
+					/*msg = strings.Replace(msg, "&", "&amp;", -1)
 					msg = strings.Replace(msg, "<", "&lt;", -1)
 					msg = strings.Replace(msg, ">", "&gt;", -1)
 					msg = strings.Replace(msg, "\"", "&quot;", -1)
-					msg = strings.Replace(msg, " ", "&nbsp;", -1)
+					msg = strings.Replace(msg, " ", "&nbsp;", -1)*/
+					msg = ReplaceHtml(msg)
 					hits[i].Path("fields.msg").SetIndex(msg, 0)
+				} else {
+					continue
+				}
+				msgh, err := hit.Path("highlight.msg").Children()
+				if err == nil {
+					msg := msgh[0].Data().(string)
+					msg = strings.Replace(msg, "<em style=\"color:red;\">", "----------", -1)
+					log.Debug("------:", msg)
 				} else {
 					continue
 				}
@@ -388,11 +397,12 @@ func SearchContext(c *echo.Context) error {
 				msgs, err := hit.Path("fields.msg").Children()
 				if err == nil {
 					msg := msgs[0].Data().(string)
-					msg = strings.Replace(msg, "&", "&amp;", -1)
+					/*msg = strings.Replace(msg, "&", "&amp;", -1)
 					msg = strings.Replace(msg, "<", "&lt;", -1)
 					msg = strings.Replace(msg, ">", "&gt;", -1)
 					msg = strings.Replace(msg, "\"", "&quot;", -1)
-					msg = strings.Replace(msg, " ", "&nbsp;", -1)
+					msg = strings.Replace(msg, " ", "&nbsp;", -1)*/
+					msg = ReplaceHtml(msg)
 					hits[i].Path("fields.msg").SetIndex(msg, 0)
 				} else {
 					continue
