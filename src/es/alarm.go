@@ -387,7 +387,7 @@ func JobExec(body []byte) error {
 			sore = EXPAND
 		}
 	}
-	log.Debug("-------:", alarm.AppName, "---", shrinkorextend, aok)
+	log.Debug("-------:", alarm.AppName, "---", shrinkorextend, aok, sore)
 	if shrinkorextend && aok {
 		if sore == EXPAND {
 			instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid))
