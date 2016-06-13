@@ -35,7 +35,7 @@ type LogAlarm struct {
 	Emails     string    `json:"emails"`
 	AliasName  string    `json:"aliasname"`
 	CreateTime time.Time `json:"createtime"`
-	Isnotice   bool      `json:"isnotice"`
+	Isnotice   uint8     `json:"isnotice"`
 	Scaling    bool      `json:"scaling"`
 	Maxs       uint64    `json:"maxs"`
 	Mins       uint64    `json:"mins"`

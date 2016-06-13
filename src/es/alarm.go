@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/Dataman-Cloud/omega-es/src/cache"
-	//"github.com/Dataman-Cloud/omega-es/src/config"
 	"github.com/Dataman-Cloud/omega-es/src/dao"
 	"github.com/Dataman-Cloud/omega-es/src/model"
 	. "github.com/Dataman-Cloud/omega-es/src/util"
@@ -14,13 +13,15 @@ import (
 	"github.com/labstack/echo"
 	"github.com/sluu99/uuid"
 	"strconv"
-	//"strings"
 	"time"
 )
 
 const (
-	EXPAND = 1
-	SHRINK = 2
+	EXPAND          = 1
+	SHRINK          = 2
+	STATUS_INACTIVE = 0
+	STATUS_ACTIVE   = 1
+	STATUS_UNUSABLE = 2
 )
 
 func CreateLogAlarm(c *echo.Context) error {
@@ -110,14 +111,10 @@ func CreateLogAlarm(c *echo.Context) error {
 	maxs, ok := json.Path("maxs").Data().(float64)
 	if !ok {
 		maxs = 0
-		//log.Error("create log alarm param can't get maxs")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "create log alarm param can't get maxs"})
 	}
 	mins, ok := json.Path("mins").Data().(float64)
 	if !ok {
 		mins = 0
-		//log.Error("create log alarm param can't get mins")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "create log alarm param can't get scaling"})
 	}
 	if count, err := dao.ExistAlarm(userid, usertype, alarmname); err != nil {
 		log.Errorf("create log alarm judge alarm exist error: %v.", err)
@@ -170,10 +167,6 @@ func CreateLogAlarm(c *echo.Context) error {
 }
 
 func GetAlarms(c *echo.Context) error {
-	//utype := c.Query("usertype")
-	//uid := c.Query("uid")
-	utype := ""
-	//userid, _ := strconv.ParseInt(uid, 10, 64)
 	uid := c.Get("uid").(string)
 	userid, err := strconv.ParseInt(uid, 10, 64)
 	if err != nil {
@@ -188,7 +181,7 @@ func GetAlarms(c *echo.Context) error {
 	sortby := c.Query("sort_by")
 	keyword := c.Query("keywords")
 
-	alarms, err := dao.GetAlarmsByUser(utype, userid, pagecount, pagenum, sortby, order, keyword)
+	alarms, err := dao.GetAlarmsByUser(userid, pagecount, pagenum, sortby, order, keyword)
 
 	if err == nil {
 		count, err := dao.CountAlarms(userid, keyword)
@@ -352,10 +345,6 @@ func JobExec(body []byte) error {
 	}
 
 	cache.UpdateScheduTime(alarm.Id)
-	/*if len(bs) == 0 {
-		return nil
-	}*/
-	//shrinkorextend := false
 	sore := SHRINK
 	for _, b := range bs {
 		if int64(b.Path("doc_count").Data().(float64)) >= alarm.GtNum {
@@ -408,47 +397,6 @@ func JobExec(body []byte) error {
 			}
 		}
 	}
-	/*alarmHistory := &model.AlarmHistory{
-		JobId:     alarm.Id,
-		ExecTime:  time.Now(),
-		ResultNum: int64(out.Count),
-		Uid:       int64(userid),
-		Cid:       int64(clusterid),
-		KeyWord:   keyword,
-		AppName:   alarm.AppName,
-		GtNum:     alarm.GtNum,
-		Ival:      alarm.Ival,
-		Ipport:    alarm.Ipport,
-		Scaling:   alarm.Scaling,
-		Maxs:      alarm.Maxs,
-		Mins:      alarm.Mins,
-	}
-	if int64(out.Count) >= alarm.GtNum {
-		alarmHistory.IsAlarm = true
-		if aid, err := dao.AddAlaramHistory(alarmHistory); err != nil {
-			log.Errorf("exec chronos job insert into alarm history error: %v", err)
-			return errors.New("exec chronos job insert into alarm history error")
-		} else {
-			memail := map[string]interface{}{
-				"template": "alarm",
-				"subject":  fmt.Sprintf("数人云日志告警-策略%d-告警事件%d", alarm.Id, aid),
-				"emails":   strings.Split(alarm.Emails, ","),
-				"data": map[string]string{
-					"content": fmt.Sprintf("应用%s日志在%d分钟内出现关键词%s%d次，请您关注", alarm.AppName, alarm.Ival, alarm.KeyWord, int64(out.Count)),
-				},
-			}
-			bemail, err := enjson.Marshal(memail)
-			if err == nil {
-				err = SendEmail(string(bemail))
-				if err != nil {
-					log.Errorf("alarm send email error: %v", err)
-					return errors.New("alarm send email error")
-				}
-			}
-		}
-	} else {
-		alarmHistory.IsAlarm = false
-	}*/
 	return nil
 }
 
@@ -563,14 +511,10 @@ func UpdateLogAlarm(c *echo.Context) error {
 	maxs, ok := json.Path("maxs").Data().(float64)
 	if !ok {
 		maxs = 0
-		//log.Error("update log alarm param can't get maxs")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get maxs"})
 	}
 	mins, ok := json.Path("mins").Data().(float64)
 	if !ok {
 		mins = 0
-		//log.Error("update log alarm param can't get mins")
-		//return ReturnError(c, map[string]interface{}{"code": 17003, "data": "update log alarm param can't get scaling"})
 	}
 	alarm, err := dao.GetAlarmById(int64(id))
 	if err != nil {
@@ -637,11 +581,15 @@ func StopLogAlarm(c *echo.Context) error {
 		log.Errorf("stop log alarm get alarm by id error: %v", id)
 		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop log alarm get alarm by id error"})
 	}
+	if alarm.Isnotice == 2 {
+		log.Debug("The service is not available")
+		return ReturnError(c, map[string]interface{}{"code": 17017, "data": "The service is not available"})
+	}
 	if method == "stop" {
-		if !alarm.Isnotice {
+		if alarm.Isnotice == STATUS_INACTIVE {
 			return ReturnOK(c, map[string]interface{}{"code": 0, "data": "alarm is already stop"})
 		}
-		alarm.Isnotice = false
+		alarm.Isnotice = STATUS_INACTIVE
 		if err = cache.DeleteAlarm(alarm.Id); err != nil {
 			log.Error("stop alarm error")
 			return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop alarm error"})
@@ -651,9 +599,8 @@ func StopLogAlarm(c *echo.Context) error {
 			log.Errorf("stop log alarm update alarm status error: %v", err)
 			return ReturnError(c, map[string]interface{}{"code": 17016, "data": "stop log alarm update alarm status error"})
 		}
-		//return ReturnOK(c, map[string]interface{}{"code": 0, "data": "stop alarm successful"})
 	} else if method == "restart" {
-		alarm.Isnotice = true
+		alarm.Isnotice = STATUS_ACTIVE
 		err = dao.UpdateAlarmStatus(&alarm)
 		if err != nil {
 			log.Errorf("restart log alarm update alarm status error: %v", err)
@@ -669,40 +616,8 @@ func StopLogAlarm(c *echo.Context) error {
 			return ReturnError(c, map[string]interface{}{"code": 17016, "data": "restart alarm error"})
 		}
 
-		//return ReturnOK(c, map[string]interface{}{"code": 0, "data": "restart log alarm successful"})
 	} else {
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "illegality operation"})
 	}
 	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "operation alarm successful"})
-}
-
-func RestartLogAlarm(c *echo.Context) error {
-	id := c.Param("id")
-	jobid, err := strconv.ParseInt(id, 10, 64)
-	if err != nil {
-		log.Errorf("restart log alarm parse id to int64 error: %v", err)
-		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "restart log alarm parse id to int64 error"})
-	}
-	alarm, err := dao.GetAlarmById(jobid)
-	if err != nil {
-		log.Errorf("restart log alarm can't get alarm by jobid")
-		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "restart log alarm can't get alarm by jobid error: " + err.Error()})
-	}
-	alarm.Isnotice = true
-	err = dao.UpdateAlarmStatus(&alarm)
-	if err != nil {
-		log.Errorf("restart log alarm update alarm status error: %v", err)
-		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "restart log alarm update alarm status error"})
-	}
-	abody, err := enjson.Marshal(alarm)
-	if err != nil {
-		log.Errorf("restart log alarm asearch parse to json string error: %v", err)
-		return ReturnError(c, map[string]interface{}{"code": 17007, "data": "restart log alarm asearch parse to json string error: " + err.Error()})
-	}
-	if err = cache.AddAlarm(alarm.Id, abody); err != nil {
-		log.Errorf("restart alarm error")
-		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "restart alarm error"})
-	}
-
-	return ReturnOK(c, map[string]interface{}{"code": 0, "data": "restart log alarm successful"})
 }
