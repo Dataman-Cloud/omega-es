@@ -54,7 +54,7 @@ func AddAlarm(alarm *model.LogAlarm) (int64, error) {
 	return id, err
 }
 
-func GetAlarmsByUser(utype string, uid, pcount, pnum int64, sortby, order, keyword string) ([]model.LogAlarm, error) {
+func GetAlarmsByUser(uid, pcount, pnum int64, sortby, order, keyword string) ([]model.LogAlarm, error) {
 	db := util.DB()
 	if pcount <= 0 {
 		pcount = 10

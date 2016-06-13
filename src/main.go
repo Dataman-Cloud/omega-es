@@ -36,44 +36,15 @@ func initEcho() {
 		es.Put("/alarm", UpdateLogAlarm)
 		es.Delete("/alarm/:id", DeleteLogAlarm)
 		es.Patch("/alarm/:id", StopLogAlarm)
-		//ea.Put("/alarm/restart/:id", RestartLogAlarm)
 
 		es.Get("/alarm/:id", GetLogAlarm)
 		es.Get("/alarm", GetAlarms)
 		es.Get("/alarm/scheduler", GetAlarmHistory)
 	}
 
-	/*es := e.Group("/api/v3/es", auth)
-	{
-		es.Post("/index", SearchIndex)
-		es.Post("/context", SearchContext)
-	}
-
-	ea := e.Group("/api/v3/alarm", auth)
-	{
-		ea.Post("/create", CreateLogAlarm)
-		ea.Put("/update", UpdateLogAlarm)
-		ea.Delete("/delete/:id", DeleteLogAlarm)
-		ea.Put("/stop/:id", StopLogAlarm)
-		ea.Put("/restart/:id", RestartLogAlarm)
-		ea.Get("/:id", GetLogAlarm)
-		ea.Get("/list", GetAlarms)
-		ea.Get("/scheduler/history", GetAlarmHistory)
-	}*/
-
-	/*ed := e.Group("/api/v3/es/download")
-	{
-		ed.Get("/index", ExportIndex)
-		ed.Get("/context", ExportContext)
-	}*/
 	e.Get("/api/v3/es/download/index", ExportIndex)
 	e.Get("/api/v3/es/download/context", ExportContext)
 	e.Get("/api/v3/health/log", Health)
-
-	/*api := e.Group("/api/v3")
-	{
-		api.Get("/health/log", Health)
-	}*/
 
 	log.Info("listening server address: ", addr)
 	s := &http.Server{
