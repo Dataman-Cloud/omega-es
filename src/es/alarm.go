@@ -211,6 +211,12 @@ func GetLogAlarm(c *echo.Context) error {
 }
 
 func DeleteLogAlarm(c *echo.Context) error {
+	uid := c.Get("uid").(string)
+	userid, err := strconv.ParseInt(uid, 10, 64)
+	if err != nil {
+		log.Errorf("delete log alarm parse userid to int64 error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "delete log alarm parse userid to int64 error: " + err.Error()})
+	}
 	id := c.Param("id")
 	jobid, err := strconv.ParseInt(id, 10, 64)
 	if err != nil {
@@ -229,6 +235,10 @@ func DeleteLogAlarm(c *echo.Context) error {
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "delete alarm remove chronos job error: " + err.Error()})
 	}*/
 
+	if err = DelScalingHistory(userid, alarm.Id); err != nil {
+		log.Errorf("delete scaling history error: %v", err)
+		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "delete scaling history error"})
+	}
 	if err = cache.DeleteAlarm(alarm.Id); err != nil {
 		log.Errorf("delete cron error: %v", err)
 		return ReturnError(c, map[string]interface{}{"code": 17003, "data": "delete cron job error"})
