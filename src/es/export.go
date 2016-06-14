@@ -56,8 +56,7 @@ func ExportIndex(c *echo.Context) error {
 		query += `,
 				  {
 				    "terms": {
-				      "ipport": ["` + strings.Join(arr, "\",\"") + `"],
-				      "minimum_match": 1
+				      "ipport": ["` + strings.Join(arr, "\",\"") + `"]
 				  }
 				}`
 	}
@@ -69,8 +68,7 @@ func ExportIndex(c *echo.Context) error {
 		query += `,
 				  {
 				    "terms": {
-				      "source": ["` + strings.Join(arr, "\",\"") + `"],
-				      "minimum_match": 1
+				      "source": ["` + strings.Join(arr, "\",\"") + `"]
 				  }
 				}`
 	}
