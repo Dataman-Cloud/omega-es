@@ -138,6 +138,24 @@ func AppScaling(body string, uid, clusterid, appid, alarmid int64) error {
 	return nil
 }
 
+func DelScalingHistory(uid, alarmid int64) error {
+	url := fmt.Sprintf("%s/api/v3/scales", config.GetConfig().Appurl)
+	log.Debug(url)
+	req, err := http.NewRequest("DELETE", url, nil)
+	if err != nil {
+		return err
+	}
+	token := CronTokenBuilder(fmt.Sprintf("%d", uid))
+	//req.Header.Set("Content-Type", "application/json")
+	req.Header.Set(InternalTokenKey, token)
+	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
+	req.Header.Set(LOG_ALARM_ID, fmt.Sprintf("%d", alarmid))
+	client := &http.Client{}
+	if _, err = client.Do(req); err != nil {
+		return err
+	}
+	return nil
+}
 func GetInstance(uid, clusterid, appid int64) (int64, error) {
 	url := fmt.Sprintf("%s/api/v3/clusters/%d/apps/%d", config.GetConfig().Appurl, clusterid, appid)
 	req, err := http.NewRequest("GET", url, nil)
