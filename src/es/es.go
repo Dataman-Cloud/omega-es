@@ -234,11 +234,6 @@ func SearchIndex(c *echo.Context) error {
 				msgs, err := hit.Path("fields.msg").Children()
 				if err == nil {
 					msg := msgs[0].Data().(string)
-					/*msg = strings.Replace(msg, "&", "&amp;", -1)
-					msg = strings.Replace(msg, "<", "&lt;", -1)
-					msg = strings.Replace(msg, ">", "&gt;", -1)
-					msg = strings.Replace(msg, "\"", "&quot;", -1)
-					msg = strings.Replace(msg, " ", "&nbsp;", -1)*/
 					msg = ReplaceHtml(msg)
 					hits[i].Path("fields.msg").SetIndex(msg, 0)
 				}
@@ -398,11 +393,6 @@ func SearchContext(c *echo.Context) error {
 				msgs, err := hit.Path("fields.msg").Children()
 				if err == nil {
 					msg := msgs[0].Data().(string)
-					/*msg = strings.Replace(msg, "&", "&amp;", -1)
-					msg = strings.Replace(msg, "<", "&lt;", -1)
-					msg = strings.Replace(msg, ">", "&gt;", -1)
-					msg = strings.Replace(msg, "\"", "&quot;", -1)
-					msg = strings.Replace(msg, " ", "&nbsp;", -1)*/
 					msg = ReplaceHtml(msg)
 					hits[i].Path("fields.msg").SetIndex(msg, 0)
 				}
