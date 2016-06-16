@@ -1,8 +1,8 @@
 package util
 
 import (
+	"fmt"
 	"github.com/Dataman-Cloud/omega-es/src/config"
-	log "github.com/cihub/seelog"
 	"github.com/garyburd/redigo/redis"
 )
 
@@ -13,17 +13,10 @@ func init() {
 }
 
 func initPool() *redis.Pool {
-	err, host := config.GetStringMapString("redis", "host")
-	if err != nil {
-		log.Error(err)
-	}
-	err, port := config.GetStringMapString("redis", "port")
-	if err != nil {
-		log.Warn("can't find redis port default:6379")
-		port = "6379"
-	}
 	return redis.NewPool(func() (redis.Conn, error) {
-		c, err := redis.Dial("tcp", host+":"+port)
+		c, err := redis.Dial("tcp",
+			fmt.Sprintf("%s:%d", config.GetConfig().Rc.Host,
+				config.GetConfig().Rc.Port))
 		return c, err
 	}, 20)
 }
