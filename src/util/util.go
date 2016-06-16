@@ -151,8 +151,20 @@ func DelScalingHistory(uid, alarmid int64) error {
 	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
 	req.Header.Set(LOG_ALARM_ID, fmt.Sprintf("%d", alarmid))
 	client := &http.Client{}
-	if _, err = client.Do(req); err != nil {
+	if resp, err := client.Do(req); err != nil {
 		return err
+	} else {
+		body, err := ReadResponseBody(resp.Body)
+		if err != nil {
+			return err
+		}
+		jsonp, err := gabs.ParseJSON(body)
+		if err != nil {
+			return err
+		}
+		if code := jsonp.Path("code").Data().(float64); int64(code) != 0 {
+			return errors.New(jsonp.Path("data").Data().(string))
+		}
 	}
 	return nil
 }
