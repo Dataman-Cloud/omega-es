@@ -79,13 +79,7 @@ func InitDB() (*sqlx.DB, error) {
 		log.Error("can not ping mysql error: ", err)
 		return db, err
 	}
-	err, maxIdleConns := config.GetStringMapInt("mysql", "maxIdleConns")
-	if err == nil {
-		db.SetMaxIdleConns(maxIdleConns)
-	}
-	err, maxOpenConns := config.GetStringMapInt("mysql", "maxOpenConns")
-	if err == nil {
-		db.SetMaxOpenConns(maxOpenConns)
-	}
+	db.SetMaxIdleConns(int(config.GetConfig().Mc.MaxIdleConns))
+	db.SetMaxOpenConns(int(config.GetConfig().Mc.MaxOpenConns))
 	return db, err
 }
