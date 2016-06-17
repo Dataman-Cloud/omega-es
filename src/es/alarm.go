@@ -390,7 +390,7 @@ func JobExec(body []byte) error {
 	if sok && scaling && aok {
 		if sore == EXPAND {
 			instances, err := GetInstance(int64(userid), int64(clusterid), int64(appid))
-			if err == nil && instances != int64(maxs) {
+			if err == nil && instances < int64(maxs) {
 				sbody := gabs.New()
 				sbody.Set("scale", "method")
 				sbody.Set(uint64(maxs), "instances")
