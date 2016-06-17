@@ -151,7 +151,9 @@ func DelScalingHistory(uid, alarmid int64) error {
 	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
 	req.Header.Set(LOG_ALARM_ID, fmt.Sprintf("%d", alarmid))
 	client := &http.Client{}
-	if resp, err := client.Do(req); err != nil {
+	resp, err := client.Do(req)
+	defer resp.Body.Close()
+	if err != nil {
 		return err
 	} else {
 		body, err := ReadResponseBody(resp.Body)
@@ -179,7 +181,9 @@ func GetInstance(uid, clusterid, appid int64) (int64, error) {
 	req.Header.Set(InternalTokenKey, token)
 	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
 	client := &http.Client{}
-	if resp, err := client.Do(req); err != nil {
+	resp, err := client.Do(req)
+	defer resp.Body.Close()
+	if err != nil {
 		return 0, err
 	} else {
 		body, err := ReadResponseBody(resp.Body)
@@ -208,11 +212,11 @@ func GetUserType(uid, clusterid int64) (string, error) {
 	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
 	client := &http.Client{}
 	resp, err := client.Do(req)
+	defer resp.Body.Close()
 	if err != nil {
 		return "", err
 	}
 	respbody, err := ReadResponseBody(resp.Body)
-	defer resp.Body.Close()
 	if err != nil {
 		log.Errorf("get user tyep read reponse body error: %v", err)
 		return "", err
