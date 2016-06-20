@@ -30,7 +30,7 @@ func CountAlarms(uid int64, keyword string) (int, error) {
 
 func AddAlarm(alarm *model.LogAlarm) (int64, error) {
 	db := util.DB()
-	sql := `insert into alarm(uid, cid, appname, ival, gtnum, alarmname, usertype, keyword, emails, aliasname, createtime, appalias,scaling,maxs,mins,appid) values(:uid, :cid, :appname, :ival, :gtnum, :alarmname, :usertype, :keyword, :emails, :aliasname, :createtime, :appalias, :scaling, :maxs, :mins, :appid)`
+	sql := `insert into alarm(uid, cid, appname, ival, gtnum, alarmname, usertype, keyword, emails, aliasname, createtime, appalias,scaling,maxs,mins,appid,level) values(:uid, :cid, :appname, :ival, :gtnum, :alarmname, :usertype, :keyword, :emails, :aliasname, :createtime, :appalias, :scaling, :maxs, :mins, :appid, :level)`
 	stmt, err := db.PrepareNamed(sql)
 	if err != nil {
 		log.Error("insert into alarm error: ", err)
@@ -80,11 +80,19 @@ func GetAlarmsByUser(uid, pcount, pnum int64, sortby, order, keyword string) ([]
 	return alarms, err
 }
 
-func GetAlarmByName(utype, alarmname string, uid int64) (model.LogAlarm, error) {
+func GetAlarmByName(appid, uid int64) (model.LogAlarm, error) {
 	db := util.DB()
 	alarm := model.LogAlarm{}
-	sql := `select * from alarm where uid = ? and usertype = ? and alarmname = ?`
-	err := db.Get(&alarm, sql, uid, utype, alarmname)
+	sql := `select * from alarm where uid = ? and appid = ?`
+	err := db.Get(&alarm, sql, uid, appid)
+	return alarm, err
+}
+
+func GetAlarmByKeyword(appid, uid int64, keyword string, alarmid int64) (model.LogAlarm, error) {
+	db := util.DB()
+	alarm := model.LogAlarm{}
+	sql := `select * from alarm where uid = ? and appid = ? and keyword = ? and id != ?`
+	err := db.Get(&alarm, sql, uid, appid, keyword, alarmid)
 	return alarm, err
 }
 
@@ -188,7 +196,7 @@ func GetHistoryByJobId(uid, pcount, pnum int64, sortby, order, keyword string) (
 
 func UpdateAlarm(alarm *model.LogAlarm) error {
 	db := util.DB()
-	sql := `update alarm set cid=:cid, appalias=:appalias, appname=:appname, ival=:ival, gtnum=:gtnum, usertype=:usertype, keyword=:keyword, emails=:emails, scaling=:scaling, maxs=:maxs, mins=:mins where id=:id`
+	sql := `update alarm set cid=:cid, appalias=:appalias, appname=:appname, ival=:ival, gtnum=:gtnum, usertype=:usertype, keyword=:keyword, emails=:emails, scaling=:scaling, maxs=:maxs, mins=:mins, level=:level where id=:id`
 	_, err := db.NamedExec(sql, alarm)
 	return err
 }

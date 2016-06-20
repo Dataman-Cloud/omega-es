@@ -39,6 +39,7 @@ type LogAlarm struct {
 	Scaling    bool      `json:"scaling"`
 	Maxs       uint64    `json:"maxs"`
 	Mins       uint64    `json:"mins"`
+	Level      string    `json:"level"`
 }
 
 type AlarmHistory struct {
@@ -57,6 +58,7 @@ type AlarmHistory struct {
 	Maxs      uint64    `json:"maxs"`
 	Mins      uint64    `json:"mins"`
 	Ipport    string    `json:"ipport"`
+	Level     string    `json:"level"`
 }
 
 type CronInfo struct {

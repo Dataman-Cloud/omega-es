@@ -116,12 +116,21 @@ func CreateLogAlarm(c *echo.Context) error {
 	if !ok {
 		mins = 0
 	}
+	level, ok := json.Path("level").Data().(string)
+	if !ok {
+		level = ""
+	}
 	if count, err := dao.ExistAlarm(userid, usertype, alarmname); err != nil {
 		log.Errorf("create log alarm judge alarm exist error: %v.", err)
 		return ReturnError(c, map[string]interface{}{"code": 17004, "data": "cleate log alarm judge exist error: " + err.Error()})
 	} else if count > 0 {
 		log.Errorf("create log alarm %s already exist.", alarmname)
 		return ReturnError(c, map[string]interface{}{"code": 17005, "data": "cleate log alarm already esist"})
+	}
+
+	if aexist, err := dao.GetAlarmByKeyword(int64(appid), userid, keyword, 0); err == nil {
+		log.Debugf("get alarm by keyword count: %v", aexist)
+		return ReturnOK(c, map[string]interface{}{"code": 17018, "data": map[string]interface{}{"alarm": aexist}})
 	}
 
 	//dao.AddAlarm
@@ -143,6 +152,7 @@ func CreateLogAlarm(c *echo.Context) error {
 		Maxs:       uint64(maxs),
 		Mins:       uint64(mins),
 		AppId:      int64(appid),
+		Level:      level,
 	}
 
 	if aid, err := dao.AddAlarm(alarm); err != nil {
@@ -281,11 +291,11 @@ func JobExec(body []byte) error {
 		return errors.New("exec chronos job param can't get keyword")
 	}
 
-	alarmname, ok := json.Path("alarmname").Data().(string)
+	/*alarmname, ok := json.Path("alarmname").Data().(string)
 	if !ok {
 		log.Error("exec chronos job param can't get alarmname")
 		return errors.New("exec chronos job param can't get alarmname")
-	}
+	}*/
 
 	interval, ok := json.Path("ival").Data().(float64)
 	if !ok {
@@ -293,11 +303,11 @@ func JobExec(body []byte) error {
 		return errors.New("exec chronos job param can't get interval")
 	}
 
-	usertype, ok := json.Path("usertype").Data().(string)
+	/*usertype, ok := json.Path("usertype").Data().(string)
 	if !ok {
 		log.Error("exec chronos job param can't get usertype")
 		return errors.New("exec chronos job param can't get usertype")
-	}
+	}*/
 	scaling, sok := json.Path("scaling").Data().(bool)
 	if !ok {
 		log.Error("exec chronos job param can't get scaling")
@@ -337,7 +347,8 @@ func JobExec(body []byte) error {
 		log.Errorf("exec chronos job search es count error: %v", err)
 		return err
 	}
-	alarm, err := dao.GetAlarmByName(usertype, alarmname, int64(userid))
+	//alarm, err := dao.GetAlarmByName(usertype, alarmname, int64(userid))
+	alarm, err := dao.GetAlarmByName(int64(appid), int64(userid))
 	if err != nil {
 		log.Errorf("exec chronos job can't get alarm by alarmname error: %v", err)
 		return err
@@ -373,6 +384,7 @@ func JobExec(body []byte) error {
 				Maxs:      alarm.Maxs,
 				Mins:      alarm.Mins,
 				IsAlarm:   true,
+				Level:     alarm.Level,
 			}
 			dao.AddAlaramHistory(alarmHistory)
 			if sok && scaling {
@@ -526,10 +538,20 @@ func UpdateLogAlarm(c *echo.Context) error {
 	if !ok {
 		mins = 0
 	}
+	level, ok := json.Path("level").Data().(string)
+	if !ok {
+		level = ""
+	}
+
 	alarm, err := dao.GetAlarmById(int64(id))
 	if err != nil {
 		log.Errorf("get alarm error: %v", err)
 		return ReturnError(c, map[string]interface{}{"code": 17016, "data": "get alarm error: " + err.Error()})
+	}
+
+	if aexist, err := dao.GetAlarmByKeyword(alarm.AppId, alarm.Uid, keyword, alarm.Id); err == nil {
+		log.Debugf("get alarm by keyword count: %v", aexist)
+		return ReturnOK(c, map[string]interface{}{"code": 17018, "data": map[string]interface{}{"alarm": aexist}})
 	}
 	alarm.Cid = int64(clusterid)
 	alarm.AppAlias = appalias
@@ -542,6 +564,7 @@ func UpdateLogAlarm(c *echo.Context) error {
 	alarm.Scaling = scaling
 	alarm.Maxs = uint64(maxs)
 	alarm.Mins = uint64(mins)
+	alarm.Level = level
 	if err = cache.UpdateAlarm(&alarm); err != nil {
 		log.Errorf("update alarm error")
 		return ReturnError(c, map[string]interface{}{"code": 17015, "data": "update alarm error"})
