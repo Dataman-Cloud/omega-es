@@ -8,7 +8,7 @@ ENV TRANSPORT 9300
 
 WORKDIR /usr/share/elasticsearch
 
-RUN /usr/share/elasticsearch/bin/plugin install mobz/elasticsearch-head
+RUN /usr/share/elasticsearch/bin/plugin install mobz/elasticsearch-head && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 COPY config ./config
 COPY ik ./plugins/ik
 
