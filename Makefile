@@ -10,7 +10,7 @@ export GO15VENDOREXPERIMENT=1
 default: build
 
 build: fmt 
-	go build -v -o ./bin/omega-es ./src/
+	go build -v -o ./omega-es ./src/
 
 rel: fmt 
 	GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -v -o ./rel/omega-es ./src/
