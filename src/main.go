@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/Dataman-Cloud/omega-es/src/config"
 	_ "github.com/Dataman-Cloud/omega-es/src/cron"
 	. "github.com/Dataman-Cloud/omega-es/src/es"
@@ -20,7 +21,7 @@ func main() {
 
 func initEcho() {
 	log.Info("echo framework starting...")
-	addr := ":" + config.GetString("port")
+	addr := fmt.Sprintf(":%d", config.GetConfig().Port)
 	e := echo.New()
 
 	e.Use(mw.Recover(), mw.Logger())
