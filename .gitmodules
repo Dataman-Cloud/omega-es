@@ -1,0 +1,3 @@
+[submodule "deploy/ci-scripts"]
+	path = deploy/ci-scripts
+	url = git@github.com:Dataman-Cloud/ci-scripts.git
