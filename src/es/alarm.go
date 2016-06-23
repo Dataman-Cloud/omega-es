@@ -386,6 +386,7 @@ func JobExec(body []byte) error {
 				IsAlarm:   true,
 				Level:     alarm.Level,
 			}
+			log.Debugf("---------: %s %s", alarm.AppName, alarm.Level)
 			dao.AddAlaramHistory(alarmHistory)
 			if sok && scaling {
 				//shrinkorextend = true
