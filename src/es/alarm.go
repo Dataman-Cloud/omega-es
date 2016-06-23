@@ -353,6 +353,10 @@ func JobExec(body []byte) error {
 		log.Errorf("exec chronos job can't get alarm by alarmname error: %v", err)
 		return err
 	}
+	if alarm.Isnotice != 1 {
+		log.Debug("alarm isnotice is not equal to 1")
+		return errors.New("alarm isnotice is not equal to 1")
+	}
 	rawjson, err := gabs.ParseJSON(out.RawJSON)
 	if err != nil {
 		log.Errorf("exec chronos job can't rawjson parse to json error: %v", err)
@@ -566,9 +570,11 @@ func UpdateLogAlarm(c *echo.Context) error {
 	alarm.Maxs = uint64(maxs)
 	alarm.Mins = uint64(mins)
 	alarm.Level = level
-	if err = cache.UpdateAlarm(&alarm); err != nil {
-		log.Errorf("update alarm error")
-		return ReturnError(c, map[string]interface{}{"code": 17015, "data": "update alarm error"})
+	if alarm.Isnotice == 1 {
+		if err = cache.UpdateAlarm(&alarm); err != nil {
+			log.Errorf("update alarm error")
+			return ReturnError(c, map[string]interface{}{"code": 17015, "data": "update alarm error"})
+		}
 	}
 	err = dao.UpdateAlarm(&alarm)
 	if err != nil {
