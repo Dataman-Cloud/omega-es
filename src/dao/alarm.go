@@ -137,7 +137,7 @@ func DeleteAlarmByUser(alarm *model.LogAlarm) error {
 
 func AddAlaramHistory(ah *model.AlarmHistory) (int64, error) {
 	db := util.DB()
-	sql := `insert into alarmhistory(jobid, isalarm, exectime, resultnum,uid,cid,keyword,appname,gtnum,ival,ipport,scaling,maxs,mins) values (:jobid, :isalarm, :exectime, :resultnum, :uid, :cid, :keyword, :appname, :gtnum, :ival,:ipport,:scaling,:maxs,:mins)`
+	sql := `insert into alarmhistory(jobid, isalarm, exectime, resultnum,uid,cid,keyword,appname,gtnum,ival,ipport,scaling,maxs,mins,level) values (:jobid, :isalarm, :exectime, :resultnum, :uid, :cid, :keyword, :appname, :gtnum, :ival,:ipport,:scaling,:maxs,:mins,:level)`
 	stmt, err := db.PrepareNamed(sql)
 	if err != nil {
 		log.Error("insert into alarm history error: ", err)
