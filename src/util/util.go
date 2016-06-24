@@ -11,7 +11,8 @@ import (
 	"github.com/Dataman-Cloud/omega-es/src/config"
 	"github.com/Jeffail/gabs"
 	log "github.com/cihub/seelog"
-	"github.com/labstack/echo"
+	"github.com/gin-gonic/gin"
+	//"github.com/labstack/echo"
 	"io"
 	"net/http"
 	"strings"
@@ -23,10 +24,15 @@ const (
 	LOG_ALARM_ID     = "Log-Alarm-Id"
 )
 
-func ReadBody(c *echo.Context) ([]byte, error) {
-	b, err := ReadResponseBody(c.Request().Body)
+func ReadBodyGin(c *gin.Context) ([]byte, error) {
+	b, err := ReadResponseBody(c.Request.Body)
 	return b, err
 }
+
+/*func ReadBody(c *echo.Context) ([]byte, error) {
+	b, err := ReadResponseBody(c.Request().Body)
+	return b, err
+}*/
 
 func ReadResponseBody(body io.ReadCloser) ([]byte, error) {
 	buf := new(bytes.Buffer)
@@ -55,13 +61,33 @@ func SameDay(start, end string) (bool, string) {
 	return false, ""
 }
 
-func ReturnOK(ctx *echo.Context, data interface{}) error {
-	return ctx.JSON(http.StatusOK, data)
+func ReturnOKGin(c *gin.Context, data interface{}) {
+	//c.JSON(http.StatusOK, gin.H{"code": 0, "data": data})
+	c.JSON(http.StatusOK, data)
 }
 
-func ReturnError(c *echo.Context, data interface{}) error {
-	return c.JSON(http.StatusBadRequest, data)
+func ReturnOKObject(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusOK, gin.H{"code": 0, "data": data})
 }
+func ReturnParamError(c *gin.Context, err string) {
+	c.JSON(http.StatusInternalServerError, gin.H{"code": 17000, "data": "", "error": err})
+}
+
+func ReturnEsError(c *gin.Context, err string) {
+	c.JSON(http.StatusInternalServerError, gin.H{"code": 17001, "data": "", "error": err})
+}
+
+func ReturnDBError(c *gin.Context, err string) {
+	c.JSON(http.StatusInternalServerError, gin.H{"code": 17002, "data": "", "error": err})
+}
+
+/*func ReturnOK(ctx *echo.Context, data interface{}) error {
+	return ctx.JSON(http.StatusOK, data)
+}*/
+
+/*func ReturnError(c *echo.Context, data interface{}) error {
+	return c.JSON(http.StatusBadRequest, data)
+}*/
 
 func ReturnErrorResponse(w http.ResponseWriter, m map[string]interface{}) {
 	b, _ := json.Marshal(m)
@@ -75,12 +101,19 @@ func ReturnOKResponse(w http.ResponseWriter, m interface{}) {
 	w.Write(b)
 }
 
-func Header(c *echo.Context, key string) string {
-	if values, _ := c.Request().Header[key]; len(values) > 0 {
+func HeaderGin(c *gin.Context, key string) string {
+	if values, _ := c.Request.Header[key]; len(values) > 0 {
 		return values[0]
 	}
 	return ""
 }
+
+/*func Header(c *echo.Context, key string) string {
+	if values, _ := c.Request().Header[key]; len(values) > 0 {
+		return values[0]
+	}
+	return ""
+}*/
 
 func FormatJson(b []byte) ([]byte, error) {
 	var out bytes.Buffer
@@ -120,7 +153,7 @@ func SendEmail(body string) error {
 }
 
 func AppScaling(body string, uid, clusterid, appid, alarmid int64) error {
-	url := fmt.Sprintf("%s/api/v3/clusters/%d/apps/%d", config.GetConfig().Appurl, clusterid, appid)
+	url := fmt.Sprintf("http://%s/api/v3/clusters/%d/apps/%d", config.GetConfig().Appurl, clusterid, appid)
 	req, err := http.NewRequest("PATCH", url, strings.NewReader(body))
 	if err != nil {
 		return err
@@ -139,8 +172,7 @@ func AppScaling(body string, uid, clusterid, appid, alarmid int64) error {
 }
 
 func DelScalingHistory(uid, alarmid int64) error {
-	url := fmt.Sprintf("%s/api/v3/scales", config.GetConfig().Appurl)
-	log.Debug(url)
+	url := fmt.Sprintf("http://%s/api/v3/scales", config.GetConfig().Appurl)
 	req, err := http.NewRequest("DELETE", url, nil)
 	if err != nil {
 		return err
@@ -152,7 +184,11 @@ func DelScalingHistory(uid, alarmid int64) error {
 	req.Header.Set(LOG_ALARM_ID, fmt.Sprintf("%d", alarmid))
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
+	defer func() {
+		if resp != nil {
+			resp.Body.Close()
+		}
+	}()
 	if err != nil {
 		return err
 	} else {
@@ -171,7 +207,7 @@ func DelScalingHistory(uid, alarmid int64) error {
 	return nil
 }
 func GetInstance(uid, clusterid, appid int64) (int64, error) {
-	url := fmt.Sprintf("%s/api/v3/clusters/%d/apps/%d", config.GetConfig().Appurl, clusterid, appid)
+	url := fmt.Sprintf("http://%s/api/v3/clusters/%d/apps/%d", config.GetConfig().Appurl, clusterid, appid)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return 0, err
@@ -182,7 +218,11 @@ func GetInstance(uid, clusterid, appid int64) (int64, error) {
 	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
 	client := &http.Client{}
 	resp, err := client.Do(req)
-	defer resp.Body.Close()
+	defer func() {
+		if resp != nil {
+			resp.Body.Close()
+		}
+	}()
 	if err != nil {
 		return 0, err
 	} else {

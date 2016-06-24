@@ -33,6 +33,13 @@
 			"branch": "master"
 		},
 		{
+			"importpath": "github.com/dustin/go-broadcast",
+			"repository": "https://github.com/dustin/go-broadcast",
+			"revision": "3bdf6d4a7164a50bc19d5f230e2981d87d2584f1",
+			"branch": "master",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/garyburd/redigo/internal",
 			"repository": "https://github.com/garyburd/redigo",
 			"revision": "836b6e58b3358112c8291565d01c35b8764070d7",
@@ -47,10 +54,25 @@
 			"path": "/redis"
 		},
 		{
+			"importpath": "github.com/gin-gonic/gin",
+			"repository": "https://github.com/gin-gonic/gin",
+			"revision": "f931d1ea80ae95a6fc739213cdd9399bd2967fb6",
+			"branch": "develop",
+			"notests": true
+		},
+		{
 			"importpath": "github.com/go-sql-driver/mysql",
 			"repository": "https://github.com/go-sql-driver/mysql",
 			"revision": "7ebe0a500653eeb1859664bed5e48dec1e164e73",
 			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/golang/protobuf/proto",
+			"repository": "https://github.com/golang/protobuf",
+			"revision": "0c1f6d65b5a189c2250d10e71a5506f06f9fa0a0",
+			"branch": "master",
+			"path": "/proto",
 			"notests": true
 		},
 		{
@@ -85,12 +107,6 @@
 			"branch": "master"
 		},
 		{
-			"importpath": "github.com/labstack/echo",
-			"repository": "https://github.com/labstack/echo",
-			"revision": "ec83e2407f257c0fa7b5ee17727d175d9d6e9f1a",
-			"branch": "master"
-		},
-		{
 			"importpath": "github.com/labstack/gommon/color",
 			"repository": "https://github.com/labstack/gommon",
 			"revision": "0764305a9af697a66da7bda2ea52672b7eca5a06",
@@ -109,6 +125,20 @@
 			"repository": "https://github.com/magiconair/properties",
 			"revision": "c81f9d71af8f8cba1466501d30326b99a4e56c19",
 			"branch": "master"
+		},
+		{
+			"importpath": "github.com/manucorporat/sse",
+			"repository": "https://github.com/manucorporat/sse",
+			"revision": "ee05b128a739a0fb76c7ebd3ae4810c1de808d6d",
+			"branch": "master",
+			"notests": true
+		},
+		{
+			"importpath": "github.com/manucorporat/stats",
+			"repository": "https://github.com/manucorporat/stats",
+			"revision": "8f2d6ace262eba462e9beb552382c98be51d807b",
+			"branch": "master",
+			"notests": true
 		},
 		{
 			"importpath": "github.com/mattbaird/elastigo/lib",
@@ -226,6 +256,13 @@
 			"repository": "https://gopkg.in/fsnotify.v1",
 			"revision": "8611c35ab31c1c28aa903d33cf8b6e44a399b09e",
 			"branch": "master"
+		},
+		{
+			"importpath": "gopkg.in/go-playground/validator.v8",
+			"repository": "https://gopkg.in/go-playground/validator.v8",
+			"revision": "25f1823069d853eccffbde025dca1812fa09c14b",
+			"branch": "master",
+			"notests": true
 		},
 		{
 			"importpath": "gopkg.in/yaml.v2",
