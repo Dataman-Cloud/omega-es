@@ -44,4 +44,6 @@ omega-es.yaml添加配置文件项
 2. 把`location ~ /es/alarm/(create|list|delete|update|stop|restart|scheduler/history|\d) {` 修改为
 `location ~ /api/v3/alarm {`
 
-
+##v0.1.062400
+把`location ~ /api/v3/alarm`
+改成`location ~ /api/v3/(alarm|alarms)`

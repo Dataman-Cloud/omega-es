@@ -9,8 +9,9 @@ import (
 	"github.com/Dataman-Cloud/omega-es/src/util"
 	log "github.com/cihub/seelog"
 	"github.com/garyburd/redigo/redis"
-	"github.com/labstack/echo"
-	mw "github.com/labstack/echo/middleware"
+	//"github.com/labstack/echo"
+	//mw "github.com/labstack/echo/middleware"
+	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
 )
@@ -22,11 +23,33 @@ func main() {
 func initEcho() {
 	log.Info("echo framework starting...")
 	addr := fmt.Sprintf(":%d", config.GetConfig().Port)
-	e := echo.New()
+
+	gin.SetMode(gin.ReleaseMode)
+	r := gin.Default()
+	r.Use(gin.Logger(), gin.Recovery())
+	v3 := r.Group("/api/v3", auth)
+	{
+		v3.POST("/es/index", SearchIndex)
+		v3.POST("/es/context", SearchContext)
+
+		v3.POST("/alarm", CreateLogAlarm)
+		v3.PUT("/alarm", UpdateLogAlarm)
+		v3.GET("/alarm", GetAlarms)
+
+		v3.GET("/alarm/:id", GetLogAlarm)
+		v3.PATCH("/alarm/:id", StopLogAlarm)
+		v3.DELETE("/alarm/:id", DeleteLogAlarm)
+
+		v3.GET("/alarms", GetAlarmHistory)
+	}
+
+	r.GET("/api/v3/health/log", Health)
+	r.GET("/api/v3/es/download/index", ExportIndex)
+	r.GET("/api/v3/es/download/context", ExportContext)
+
+	/*e := echo.New()
 
 	e.Use(mw.Recover(), mw.Logger())
-
-	//e.Use(CrossDomain)
 
 	es := e.Group("/api/v3", auth)
 	{
@@ -45,12 +68,12 @@ func initEcho() {
 
 	e.Get("/api/v3/es/download/index", ExportIndex)
 	e.Get("/api/v3/es/download/context", ExportContext)
-	e.Get("/api/v3/health/log", Health)
+	e.Get("/api/v3/health/log", Health)*/
 
 	log.Info("listening server address: ", addr)
 	s := &http.Server{
 		Addr:           addr,
-		Handler:        e,
+		Handler:        r,
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 		MaxHeaderBytes: 1 << 20,
@@ -58,7 +81,7 @@ func initEcho() {
 	s.ListenAndServe()
 }
 
-func CrossDomain(c *echo.Context) error {
+/*func CrossDomain(c *echo.Context) error {
 	c.Response().Header().Set("Access-Control-Allow-Origin", "*")
 	c.Request().Header.Set("Access-Control-Allow-Credentials", "true")
 	c.Request().Header.Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
@@ -87,5 +110,26 @@ func auth(c *echo.Context) error {
 		return nil
 	} else {
 		return echo.NewHTTPError(http.StatusUnauthorized, time.Now().Format(time.RFC3339Nano)+" "+"validation failed...")
+	}
+}*/
+
+func auth(c *gin.Context) {
+	auth := false
+	if authtoken := util.HeaderGin(c, "Authorization"); authtoken != "" {
+		conn := util.Open()
+		defer conn.Close()
+		uid, err := redis.String(conn.Do("HGET", "s:"+authtoken, "user_id"))
+		if err == nil {
+			auth = true
+			c.Set("uid", uid)
+		} else if err != redis.ErrNil {
+			log.Error("[app] got error1 ", err)
+		}
+	}
+	if auth {
+		c.Next()
+	} else {
+		c.String(http.StatusUnauthorized, "Invalid authentication")
+		c.Abort()
 	}
 }
