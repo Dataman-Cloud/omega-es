@@ -2,121 +2,15 @@ package es
 
 import (
 	"fmt"
-	"github.com/Dataman-Cloud/omega-es/src/dao"
 	. "github.com/Dataman-Cloud/omega-es/src/util"
 	"github.com/Jeffail/gabs"
 	log "github.com/cihub/seelog"
-	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
 	//"github.com/labstack/echo"
 	//"net/http"
 	"strconv"
 	"strings"
-	"time"
 )
-
-func Health(c *gin.Context) {
-	astart := time.Now().UnixNano()
-	ma := map[string]interface{}{
-		"status": 0,
-	}
-	start := time.Now().UnixNano()
-	_, err := Conn.AllNodesInfo()
-	mes := make(map[string]interface{})
-	if err == nil {
-		mes["status"] = 0
-	} else {
-		mes["status"] = 1
-		ma["status"] = 1
-	}
-	end := time.Now().UnixNano()
-	mes["time"] = (end - start) / 1000000
-
-	mall := map[string]interface{}{
-		"elasticsearch": mes,
-	}
-
-	start = time.Now().UnixNano()
-	conn := Open()
-	defer conn.Close()
-	mredis := make(map[string]interface{})
-	_, err = redis.String(conn.Do("PING"))
-	if err == nil {
-		mredis["status"] = 0
-	} else {
-		mredis["status"] = 1
-		ma["status"] = 1
-	}
-	end = time.Now().UnixNano()
-	mredis["time"] = (end - start) / 1000000
-	mall["redis"] = mredis
-	aend := time.Now().UnixNano()
-	ma["time"] = (aend - astart) / 1000000
-	mall["omegaEs"] = ma
-
-	mmsql := make(map[string]interface{})
-	mysqlstart := time.Now().UnixNano()
-	if err = dao.Ping(); err == nil {
-		mmsql["status"] = 0
-	} else {
-		mmsql["status"] = 1
-	}
-	mmsql["time"] = (time.Now().UnixNano() - mysqlstart) / 1000000
-	mall["mysql"] = mmsql
-	ReturnOKGin(c, mall)
-	return
-}
-
-/*func Health(c *echo.Context) error {
-	astart := time.Now().UnixNano()
-	ma := map[string]interface{}{
-		"status": 0,
-	}
-	start := time.Now().UnixNano()
-	_, err := Conn.AllNodesInfo()
-	mes := make(map[string]interface{})
-	if err == nil {
-		mes["status"] = 0
-	} else {
-		mes["status"] = 1
-		ma["status"] = 1
-	}
-	end := time.Now().UnixNano()
-	mes["time"] = (end - start) / 1000000
-
-	mall := map[string]interface{}{
-		"elasticsearch": mes,
-	}
-
-	start = time.Now().UnixNano()
-	conn := Open()
-	defer conn.Close()
-	mredis := make(map[string]interface{})
-	_, err = redis.String(conn.Do("PING"))
-	if err == nil {
-		mredis["status"] = 0
-	} else {
-		mredis["status"] = 1
-		ma["status"] = 1
-	}
-	end = time.Now().UnixNano()
-	mredis["time"] = (end - start) / 1000000
-	mall["redis"] = mredis
-	aend := time.Now().UnixNano()
-	ma["time"] = (aend - astart) / 1000000
-	mall["omegaEs"] = ma
-
-	mmsql := make(map[string]interface{})
-	mysqlstart := time.Now().UnixNano()
-	if err = dao.Ping(); err == nil {
-		mmsql["status"] = 0
-	} else {
-		mmsql["status"] = 1
-	}
-	mmsql["time"] = (time.Now().UnixNano() - mysqlstart) / 1000000
-	mall["mysql"] = mmsql
-	return c.JSON(http.StatusOK, mall)
-}*/
 
 func SearchIndex(c *gin.Context) {
 	body, err := ReadBodyGin(c)
