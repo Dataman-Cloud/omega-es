@@ -12,7 +12,6 @@ import (
 	"github.com/Jeffail/gabs"
 	log "github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
-	//"github.com/labstack/echo"
 	"io"
 	"net/http"
 	"strings"
@@ -24,15 +23,10 @@ const (
 	LOG_ALARM_ID     = "Log-Alarm-Id"
 )
 
-func ReadBodyGin(c *gin.Context) ([]byte, error) {
+func ReadBody(c *gin.Context) ([]byte, error) {
 	b, err := ReadResponseBody(c.Request.Body)
 	return b, err
 }
-
-/*func ReadBody(c *echo.Context) ([]byte, error) {
-	b, err := ReadResponseBody(c.Request().Body)
-	return b, err
-}*/
 
 func ReadResponseBody(body io.ReadCloser) ([]byte, error) {
 	buf := new(bytes.Buffer)
@@ -81,14 +75,6 @@ func ReturnDBError(c *gin.Context, err string) {
 	c.JSON(http.StatusInternalServerError, gin.H{"code": 17002, "data": "", "error": err})
 }
 
-/*func ReturnOK(ctx *echo.Context, data interface{}) error {
-	return ctx.JSON(http.StatusOK, data)
-}*/
-
-/*func ReturnError(c *echo.Context, data interface{}) error {
-	return c.JSON(http.StatusBadRequest, data)
-}*/
-
 func ReturnErrorResponse(w http.ResponseWriter, m map[string]interface{}) {
 	b, _ := json.Marshal(m)
 	w.Header()["Content-Type"] = []string{"application/json; charset=utf-8"}
@@ -101,19 +87,12 @@ func ReturnOKResponse(w http.ResponseWriter, m interface{}) {
 	w.Write(b)
 }
 
-func HeaderGin(c *gin.Context, key string) string {
+func Header(c *gin.Context, key string) string {
 	if values, _ := c.Request.Header[key]; len(values) > 0 {
 		return values[0]
 	}
 	return ""
 }
-
-/*func Header(c *echo.Context, key string) string {
-	if values, _ := c.Request().Header[key]; len(values) > 0 {
-		return values[0]
-	}
-	return ""
-}*/
 
 func FormatJson(b []byte) ([]byte, error) {
 	var out bytes.Buffer

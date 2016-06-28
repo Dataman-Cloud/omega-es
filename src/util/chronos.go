@@ -31,14 +31,6 @@ func CreateJob(body string) error {
 	if err != nil {
 		log.Errorf("create chronos job client do error: %v", err)
 	}
-	/*respbody, err := ReadResponseBody(resp.Body)
-	defer respbody.Body.Close()
-	if err != nil {
-		log.Errorf("create chronos job read response body error: %v", err)
-		return err
-	}
-
-	jsonp, _ := gabs.ParseJSON(respbody)*/
 	return nil
 }
 
@@ -54,14 +46,6 @@ func UpdateJob(body string) error {
 	if err != nil {
 		log.Errorf("create chronos job client do error: %v", err)
 	}
-	/*respbody, err := ReadResponseBody(resp.Body)
-	defer respbody.Body.Close()
-	if err != nil {
-		log.Errorf("create chronos job read response body error: %v", err)
-		return err
-	}
-
-	jsonp, _ := gabs.ParseJSON(respbody)*/
 	return nil
 }
 func DeleteJob(name string) error {
