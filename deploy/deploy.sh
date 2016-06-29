@@ -20,8 +20,6 @@ curl -v -X POST $MARATHON_API_URL/v2/apps -H Content-Type:application/json -d \
                                 }
                    },
       "env": {
-            "CONFIG_SERVER": "'$CONFIGSERVER'/config/'$TASKENV'",
-		    "SERVICE": "cfgfile_'$TASKENV'_omega_es",
 		    "BAMBOO_TCP_PORT": "'$BAMBOO_TCP_PORT'",
             "BAMBOO_PRIVATE": "'$BAMBOO_PRIVATE'",
             "BAMBOO_PROXY":"'$BAMBOO_PROXY'",
