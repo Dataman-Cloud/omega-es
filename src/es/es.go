@@ -12,7 +12,6 @@ import (
 )
 
 func SearchIndex(c *gin.Context) {
-	fmt.Println("-------1")
 	body, err := ReadBody(c)
 	if err != nil {
 		log.Error("searchindex can't get request body")
