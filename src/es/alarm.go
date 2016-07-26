@@ -4,6 +4,9 @@ import (
 	enjson "encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/Dataman-Cloud/omega-es/src/cache"
 	"github.com/Dataman-Cloud/omega-es/src/dao"
 	"github.com/Dataman-Cloud/omega-es/src/model"
@@ -12,8 +15,6 @@ import (
 	log "github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
 	"github.com/sluu99/uuid"
-	"strconv"
-	"time"
 )
 
 const (
@@ -195,7 +196,7 @@ func CreateLogAlarm(c *gin.Context) {
 		return
 	}
 
-	ReturnOKGin(c, map[string]interface{}{"code": 0, "data": "create log alarm successful"})
+	ReturnCreatedOKGin(c, map[string]interface{}{"code": 0, "data": "create log alarm successful"})
 	return
 }
 

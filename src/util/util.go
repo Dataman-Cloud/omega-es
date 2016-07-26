@@ -8,13 +8,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
+	"net/http"
+	"strings"
+
 	"github.com/Dataman-Cloud/omega-es/src/config"
 	"github.com/Jeffail/gabs"
 	log "github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
-	"io"
-	"net/http"
-	"strings"
 )
 
 const (
@@ -56,15 +57,18 @@ func SameDay(start, end string) (bool, string) {
 }
 
 func ReturnOKGin(c *gin.Context, data interface{}) {
-	//c.JSON(http.StatusOK, gin.H{"code": 0, "data": data})
 	c.JSON(http.StatusOK, data)
+}
+
+func ReturnCreatedOKGin(c *gin.Context, data interface{}) {
+	c.JSON(http.StatusCreated, data)
 }
 
 func ReturnOKObject(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, gin.H{"code": 0, "data": data})
 }
 func ReturnParamError(c *gin.Context, err string) {
-	c.JSON(http.StatusInternalServerError, gin.H{"code": 17000, "data": "", "error": err})
+	c.JSON(http.StatusBadRequest, gin.H{"code": 17000, "data": "", "error": err})
 }
 
 func ReturnEsError(c *gin.Context, err string) {

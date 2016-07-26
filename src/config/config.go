@@ -3,14 +3,15 @@ package config
 import (
 	"bufio"
 	"errors"
-	log "github.com/cihub/seelog"
 	"os"
 	"reflect"
 	"strconv"
 	"strings"
+
+	log "github.com/cihub/seelog"
 )
 
-func init() {
+func ConfigInit() {
 	InitConfig("deploy/env")
 }
 

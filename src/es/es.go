@@ -2,15 +2,17 @@ package es
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
+
 	. "github.com/Dataman-Cloud/omega-es/src/util"
 	"github.com/Jeffail/gabs"
 	log "github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
-	"strconv"
-	"strings"
 )
 
 func SearchIndex(c *gin.Context) {
+	fmt.Println("-------1")
 	body, err := ReadBody(c)
 	if err != nil {
 		log.Error("searchindex can't get request body")

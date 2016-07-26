@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/Dataman-Cloud/omega-es/src/config"
 	_ "github.com/Dataman-Cloud/omega-es/src/cron"
 	. "github.com/Dataman-Cloud/omega-es/src/es"
@@ -10,11 +13,14 @@ import (
 	log "github.com/cihub/seelog"
 	"github.com/garyburd/redigo/redis"
 	"github.com/gin-gonic/gin"
-	"net/http"
-	"time"
 )
 
 func main() {
+	config.ConfigInit()
+	util.ChronosInit()
+	util.MysqlInit()
+	util.EsInit()
+	util.RedisInit()
 	initEcho()
 }
 

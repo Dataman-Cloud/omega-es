@@ -2,10 +2,11 @@ package util
 
 import (
 	"fmt"
-	"github.com/Dataman-Cloud/omega-es/src/config"
-	log "github.com/cihub/seelog"
 	"net/http"
 	"strings"
+
+	"github.com/Dataman-Cloud/omega-es/src/config"
+	log "github.com/cihub/seelog"
 )
 
 var chronosUrl string
@@ -15,7 +16,7 @@ const (
 	deljob = "scheduler/job/"
 )
 
-func init() {
+func ChronosInit() {
 	chronosUrl = fmt.Sprintf("http://%s:%d/", config.GetConfig().Ch.Host, config.GetConfig().Ch.Port)
 }
 

@@ -2,16 +2,17 @@ package util
 
 import (
 	"fmt"
+	"sync"
+
 	"github.com/Dataman-Cloud/omega-es/src/config"
 	log "github.com/cihub/seelog"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattes/migrate/driver/mysql"
 	"github.com/mattes/migrate/migrate"
-	"sync"
 )
 
-func init() {
+func MysqlInit() {
 	DB()
 	upgradeDB()
 }
