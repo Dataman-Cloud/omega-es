@@ -371,12 +371,14 @@ func JobExec(body []byte) error {
 		`{"term":{"typename":"` + appalias + `"}},{"match":{"msg":{"query":"` + keyword + `","analyzer":"ik"}}}]}},` +
 		`"filter":{"bool":{"must":[{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) +
 		`","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}},"aggs":{"ds":{"terms":{"field":"ipport","size":0}}}}`
-	esindex := "dataman-app-" + fmt.Sprintf("%d", clusterid) + "-" + time.Now().String()[:10]
-	estype := "dataman-" + appalias
+	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + time.Now().String()[:10]
 	/*gid, err := GetUserType(int64(userid), int64(clusterid))
 	if err == nil {
 		esindex = "logstash-*" + gid + "-" + time.Now().String()[:10]
 	}*/
+	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appalias
+	esindex = "*"
+	estype = ""
 	//out, err := Conn.Count(esindex, estype, nil, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	log.Debug("---", esindex, estype, query, err, string(out.RawJSON))
