@@ -25,19 +25,6 @@ func SearchIndex(c *gin.Context) {
 		return
 	}
 
-	uid, ok := c.Get("uid")
-	if !ok {
-		log.Error("searchindex can't get uid")
-		ReturnParamError(c, "searchindex can't get uid")
-		return
-	}
-	userid, err := strconv.ParseInt(uid.(string), 10, 64)
-	if err != nil {
-		log.Error("serachindex invalid token")
-		ReturnParamError(c, err.Error())
-		return
-	}
-
 	clusterid, ok := json.Path("clusterid").Data().(float64)
 	if !ok {
 		log.Error("searchindex param can't found clusterid")
@@ -159,15 +146,14 @@ func SearchIndex(c *gin.Context) {
 		  "fragment_size": -1
 		}
 	       }`
-	esindex := "logstash-*" + fmt.Sprintf("%d", userid) + "-"
-	estype := ""
+	esindex := "dataman-app-" + fmt.Sprintf("%d", clusterid) + "-"
+	estype := "dataman-" + appname
+	//estype := ""
 	if start[:10] == end[:10] {
 		esindex += start[:10]
-		//estype = "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	} else {
 		esindex += "*"
 	}
-	esindex = "*"
 	log.Debug(esindex, estype, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
@@ -219,19 +205,6 @@ func SearchContext(c *gin.Context) {
 	json, err := gabs.ParseJSON(body)
 	if err != nil {
 		log.Error("searchcontext param parse json error")
-		ReturnParamError(c, err.Error())
-		return
-	}
-
-	uid, ok := c.Get("uid")
-	if !ok {
-		log.Error("searchcontext can't get uid")
-		ReturnParamError(c, "searchcontext can't get uid")
-		return
-	}
-	userid, err := strconv.ParseInt(uid.(string), 10, 64)
-	if err != nil {
-		log.Error("serachcontext invalid token")
 		ReturnParamError(c, err.Error())
 		return
 	}
@@ -330,10 +303,9 @@ func SearchContext(c *gin.Context) {
 		      "fragment_size": -1
 	            }
 		  }`
-	esindex := "logstash-*" + fmt.Sprintf("%d", userid) + "-" + timestamp[:10]
-	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
-	estype := ""
-	esindex = "*"
+	esindex := "dataman-app-" + fmt.Sprintf("%d", clusterid) + "-" + timestamp[:10]
+	estype := "dataman-" + appname
+	//esindex := "*"
 	log.Debug(esindex, estype, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
