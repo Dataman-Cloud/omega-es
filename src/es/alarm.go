@@ -4,6 +4,9 @@ import (
 	enjson "encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/Dataman-Cloud/omega-es/src/cache"
 	"github.com/Dataman-Cloud/omega-es/src/dao"
 	"github.com/Dataman-Cloud/omega-es/src/model"
@@ -12,8 +15,6 @@ import (
 	log "github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
 	"github.com/sluu99/uuid"
-	"strconv"
-	"time"
 )
 
 const (
@@ -195,7 +196,7 @@ func CreateLogAlarm(c *gin.Context) {
 		return
 	}
 
-	ReturnOKGin(c, map[string]interface{}{"code": 0, "data": "create log alarm successful"})
+	ReturnCreatedOKGin(c, map[string]interface{}{"code": 0, "data": "create log alarm successful"})
 	return
 }
 
@@ -364,23 +365,20 @@ func JobExec(body []byte) error {
 	if !ok {
 		log.Error("exec chronos job param can't get appid")
 	}
-
 	endtime := time.Now().Unix()
 	starttime := endtime - int64(interval)*60
 	query := `{"size":0,"query":{"filtered":{"query":{"bool":{"must":[{"term":{"clusterid":` + fmt.Sprintf("%d", int64(clusterid)) + `}},` +
 		`{"term":{"typename":"` + appalias + `"}},{"match":{"msg":{"query":"` + keyword + `","analyzer":"ik"}}}]}},` +
 		`"filter":{"bool":{"must":[{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) +
 		`","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}},"aggs":{"ds":{"terms":{"field":"ipport","size":0}}}}`
-	esindex := "logstash-*" + strconv.Itoa(int(userid)) + "-" + time.Now().String()[:10]
+	esindex := "dataman-app-" + fmt.Sprintf("%d", int64(clusterid)) + "-" + time.Now().String()[:10]
+	estype := "dataman-" + appalias
 	/*gid, err := GetUserType(int64(userid), int64(clusterid))
 	if err == nil {
 		esindex = "logstash-*" + gid + "-" + time.Now().String()[:10]
 	}*/
-	estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appalias
-	esindex = "*"
-	estype = ""
 	//out, err := Conn.Count(esindex, estype, nil, query)
-	out, err := Conn.Search(esindex, estype, nil, query)
+	out, err := EsSearch(esindex, estype, nil, query)
 	log.Debug("---", esindex, estype, query, err, string(out.RawJSON))
 	if err != nil {
 		log.Errorf("exec chronos job search es count error: %v", err)

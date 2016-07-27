@@ -2,13 +2,14 @@ package util
 
 import (
 	"fmt"
+
 	"github.com/Dataman-Cloud/omega-es/src/config"
 	"github.com/garyburd/redigo/redis"
 )
 
 var pool *redis.Pool
 
-func init() {
+func RedisInit() {
 	pool = initPool()
 }
 
