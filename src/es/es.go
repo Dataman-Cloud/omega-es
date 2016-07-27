@@ -146,7 +146,7 @@ func SearchIndex(c *gin.Context) {
 		  "fragment_size": -1
 		}
 	       }`
-	esindex := "dataman-app-" + fmt.Sprintf("%d", clusterid) + "-"
+	esindex := "dataman-app-" + fmt.Sprintf("%d", int64(clusterid)) + "-"
 	estype := "dataman-" + appname
 	//estype := ""
 	if start[:10] == end[:10] {
@@ -303,7 +303,7 @@ func SearchContext(c *gin.Context) {
 		      "fragment_size": -1
 	            }
 		  }`
-	esindex := "dataman-app-" + fmt.Sprintf("%d", clusterid) + "-" + timestamp[:10]
+	esindex := "dataman-app-" + fmt.Sprintf("%d", int64(clusterid)) + "-" + timestamp[:10]
 	estype := "dataman-" + appname
 	//esindex := "*"
 	log.Debug(esindex, estype, query)

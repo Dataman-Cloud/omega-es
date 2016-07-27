@@ -1,12 +1,17 @@
 package es
 
 import (
+	"errors"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
+	"time"
 
+	"github.com/Dataman-Cloud/omega-es/src/util"
 	"github.com/gin-gonic/gin"
+	es "github.com/mattbaird/elastigo/lib"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -47,4 +52,36 @@ func TestSearchIndexBadRequest(t *testing.T) {
 	}
 
 	assert.Equal(t, resp.StatusCode, http.StatusBadRequest)
+}
+
+var esindex string
+var estype string
+
+var fakeEsSearch = func(index string, _type string, args map[string]interface{}, query interface{}) (es.SearchResult, error) {
+	esindex = index
+	estype = _type
+	fmt.Println(index)
+	fmt.Println(_type)
+	return es.SearchResult{}, errors.New("FakeError")
+}
+
+func TestJobExec(t *testing.T) {
+	util.EsSearch = fakeEsSearch
+	var body = `{
+						"uid":123,
+						"cid":456,
+						"appalias":"wwwww",
+						"keyword":"key",
+						"ival":1,
+						"scaling":true,
+						"maxs":10,
+						"mins":1,
+						"appid":10}
+		`
+
+	JobExec([]byte(body))
+
+	assert.Equal(t, esindex, "dataman-app-456-"+time.Now().String()[:10])
+	assert.Equal(t, estype, "dataman-wwwww")
+
 }

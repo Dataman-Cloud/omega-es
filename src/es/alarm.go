@@ -302,11 +302,13 @@ func DeleteLogAlarm(c *gin.Context) {
 }
 
 func JobExec(body []byte) error {
+
 	json, err := gabs.ParseJSON(body)
 	if err != nil {
 		log.Error("exec chronos job request parse to json error: ", err)
 		return err
 	}
+	fmt.Println(json)
 	userid, ok := json.Path("uid").Data().(float64)
 	if !ok {
 		log.Error("exec chronos job param can't get userid")
@@ -365,21 +367,20 @@ func JobExec(body []byte) error {
 	if !ok {
 		log.Error("exec chronos job param can't get appid")
 	}
-
 	endtime := time.Now().Unix()
 	starttime := endtime - int64(interval)*60
 	query := `{"size":0,"query":{"filtered":{"query":{"bool":{"must":[{"term":{"clusterid":` + fmt.Sprintf("%d", int64(clusterid)) + `}},` +
 		`{"term":{"typename":"` + appalias + `"}},{"match":{"msg":{"query":"` + keyword + `","analyzer":"ik"}}}]}},` +
 		`"filter":{"bool":{"must":[{"range":{"timestamp":{"gte":"` + time.Unix(starttime, 0).Format(time.RFC3339) +
 		`","lte":"` + time.Unix(endtime, 0).Format(time.RFC3339) + `"}}}]}}}},"aggs":{"ds":{"terms":{"field":"ipport","size":0}}}}`
-	esindex := "dataman-app-" + fmt.Sprintf("%d", clusterid) + "-" + time.Now().String()[:10]
+	esindex := "dataman-app-" + fmt.Sprintf("%d", int64(clusterid)) + "-" + time.Now().String()[:10]
 	estype := "dataman-" + appalias
 	/*gid, err := GetUserType(int64(userid), int64(clusterid))
 	if err == nil {
 		esindex = "logstash-*" + gid + "-" + time.Now().String()[:10]
 	}*/
 	//out, err := Conn.Count(esindex, estype, nil, query)
-	out, err := Conn.Search(esindex, estype, nil, query)
+	out, err := EsSearch(esindex, estype, nil, query)
 	log.Debug("---", esindex, estype, query, err, string(out.RawJSON))
 	if err != nil {
 		log.Errorf("exec chronos job search es count error: %v", err)
