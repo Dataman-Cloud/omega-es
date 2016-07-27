@@ -2,16 +2,16 @@ package es
 
 import (
 	"encoding/json"
+	"strconv"
+	"strings"
+
 	. "github.com/Dataman-Cloud/omega-es/src/util"
 	"github.com/Jeffail/gabs"
 	log "github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
-	"strconv"
-	"strings"
 )
 
 func ExportIndex(c *gin.Context) {
-	//uid := c.Query("userid")
 	cid := c.Query("clusterid")
 	appname := c.Query("appname")
 	start := c.Query("start")

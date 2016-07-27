@@ -2,7 +2,6 @@ package es
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -60,8 +59,6 @@ var estype string
 var fakeEsSearch = func(index string, _type string, args map[string]interface{}, query interface{}) (es.SearchResult, error) {
 	esindex = index
 	estype = _type
-	fmt.Println(index)
-	fmt.Println(_type)
 	return es.SearchResult{}, errors.New("FakeError")
 }
 
@@ -80,7 +77,6 @@ func TestJobExec(t *testing.T) {
 		`
 
 	JobExec([]byte(body))
-
 	assert.Equal(t, esindex, "dataman-app-456-"+time.Now().String()[:10])
 	assert.Equal(t, estype, "dataman-wwwww")
 

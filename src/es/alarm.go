@@ -302,13 +302,11 @@ func DeleteLogAlarm(c *gin.Context) {
 }
 
 func JobExec(body []byte) error {
-
 	json, err := gabs.ParseJSON(body)
 	if err != nil {
 		log.Error("exec chronos job request parse to json error: ", err)
 		return err
 	}
-	fmt.Println(json)
 	userid, ok := json.Path("uid").Data().(float64)
 	if !ok {
 		log.Error("exec chronos job param can't get userid")
