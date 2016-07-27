@@ -11,7 +11,7 @@ import (
 )
 
 func ExportIndex(c *gin.Context) {
-	//uid := c.Query("userid")
+	uid := c.Query("userid")
 	cid := c.Query("clusterid")
 	appname := c.Query("appname")
 	start := c.Query("start")
@@ -92,14 +92,15 @@ func ExportIndex(c *gin.Context) {
 			}
 		       }`
 
-	esindex := "dataman-app-" + cid + "-"
-	estype := "dataman-" + appname
+	esindex := "logstash-*" + uid + "-"
+	estype := ""
 	if start[:10] == end[:10] {
 		esindex += start[:10]
 		//estype = "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	} else {
 		esindex += "*"
 	}
+	esindex = "*"
 	log.Debug(esindex, estype, query)
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
@@ -202,8 +203,10 @@ func ExportContext(c *gin.Context) {
 		      "fragment_size": -1
 	            }
 		  }`
-	esindex := "dataman-app-" + cid + "-" + timestamp[:10]
-	estype := "dataman-" + appname
+	esindex := "logstash-*" + uid + "-" + timestamp[:10]
+	esindex = "*"
+	estype := ""
+	//estype := "logstash-" + strconv.Itoa(int(clusterid)) + "-" + appname
 	out, err := Conn.Search(esindex, estype, nil, query)
 	if err != nil {
 		log.Error("searchindex search es error: ", err)
