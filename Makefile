@@ -1,4 +1,4 @@
-.PHONY: build doc fmt lint run test vet
+.PHONY: build doc fmt lint run test vet collect-cover-data test-cover-html test-cover-func
 
 # Prepend our vendor directory to the system GOPATH
 # so that import path resolution will prioritize
@@ -32,6 +32,19 @@ run: build
 
 test:
 	go test ./src/...
+
+PACKAGES = $(shell find ./src/ -type d -not -path '*/\.*')
+collect-cover-data:
+	echo "mode: count" > coverage-all.out
+	@$(foreach pkg,$(PACKAGES),\
+		go test -v -coverprofile=coverage.out -covermode=count $(pkg);\
+		tail -n +2 coverage.out >> coverage-all.out;)
+
+test-cover-html:
+	go tool cover -html=coverage-all.out -o coverage.html
+
+test-cover-func:
+	go tool cover -func=coverage-all.out
 
 # http://godoc.org/code.google.com/p/go.tools/cmd/vet
 # go get code.google.com/p/go.tools/cmd/vet
