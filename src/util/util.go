@@ -29,7 +29,7 @@ func ReadBody(c *gin.Context) ([]byte, error) {
 	return b, err
 }
 
-func ReadResponseBody(body io.ReadCloser) ([]byte, error) {
+var ReadResponseBody = func(body io.ReadCloser) ([]byte, error) {
 	buf := new(bytes.Buffer)
 	_, err := buf.ReadFrom(body)
 	if err != nil {
@@ -189,11 +189,12 @@ func DelScalingHistory(uid, alarmid int64) error {
 	}
 	return nil
 }
-func GetInstance(uid, clusterid, appid int64) (int64, error) {
+
+var getAppInstance = func(uid, clusterid, appid int64) (*http.Response, error) {
 	url := fmt.Sprintf("http://%s/api/v3/clusters/%d/apps/%d", config.GetConfig().Appurl, clusterid, appid)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return 0, err
+		return nil, err
 	}
 	token := CronTokenBuilder(fmt.Sprintf("%d", uid))
 	req.Header.Set("Content-Type", "application/json")
@@ -201,11 +202,17 @@ func GetInstance(uid, clusterid, appid int64) (int64, error) {
 	req.Header.Set("Uid", fmt.Sprintf("%d", uid))
 	client := &http.Client{}
 	resp, err := client.Do(req)
+	return resp, err
+}
+
+func GetInstance(uid, clusterid, appid int64) (int64, error) {
+	resp, err := getAppInstance(uid, clusterid, appid)
 	defer func() {
 		if resp != nil {
 			resp.Body.Close()
 		}
 	}()
+
 	if err != nil {
 		return 0, err
 	} else {
@@ -216,6 +223,10 @@ func GetInstance(uid, clusterid, appid int64) (int64, error) {
 		jsonp, err := gabs.ParseJSON(body)
 		if err != nil {
 			return 0, err
+		}
+
+		if jsonp.Path("data.instances").Data() == nil {
+			return 0, nil
 		}
 		return int64(jsonp.Path("data.instances").Data().(float64)), nil
 
