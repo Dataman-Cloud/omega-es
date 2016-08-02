@@ -213,6 +213,9 @@ func GetInstance(uid, clusterid, appid int64) (int64, error) {
 		if err != nil {
 			return 0, err
 		}
+		if jsonp.Path("data.instances").Data() == nil {
+			return 0, nil
+		}
 		return int64(jsonp.Path("data.instances").Data().(float64)), nil
 
 	}
